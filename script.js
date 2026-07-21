@@ -1,8 +1,8 @@
 const CONFIG = {
-  javaAddress: "",
-  bedrockAddress: "",
-  bedrockPort: "",
-  discordUrl: "",
+  javaAddress: "loghorizon.enxada.host",
+  bedrockAddress: "enx-cirion-84.enx.host",
+  bedrockPort: "10167",
+  discordUrl: "https://discord.gg/wCxTJY3W7G",
   apkUrl: "downloads/LogHorizonVoice-v1.0.0.apk",
   apkVersion: "1.0.0"
 };
