@@ -3,7 +3,7 @@ const CONFIG = {
   bedrockAddress: "",
   bedrockPort: "",
   discordUrl: "",
-  apkUrl: "",
+  apkUrl: "downloads/LogHorizonVoice-v1.0.0.apk",
   apkVersion: "1.0.0"
 };
 
@@ -11,6 +11,33 @@ const header = document.querySelector(".site-header");
 const menuButton = document.querySelector(".menu-button");
 const navLinks = document.querySelector(".nav-links");
 const toast = document.querySelector(".toast");
+
+async function configureDownload() {
+  const downloadButton = document.querySelector(".download-button");
+  const note = document.querySelector(".download-note");
+  if (!CONFIG.apkUrl || !downloadButton) return;
+
+  try {
+    const response = await fetch(CONFIG.apkUrl, { method: "HEAD", cache: "no-store" });
+    if (!response.ok) return;
+
+    downloadButton.disabled = false;
+    downloadButton.textContent = `BAIXAR V${CONFIG.apkVersion}`;
+    downloadButton.title = "Baixar Log Horizon Voice";
+    note.textContent = "Download oficial da versão release assinada para Android.";
+
+    downloadButton.addEventListener("click", () => {
+      const anchor = document.createElement("a");
+      anchor.href = CONFIG.apkUrl;
+      anchor.download = `LogHorizonVoice-v${CONFIG.apkVersion}.apk`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    });
+  } catch {
+    // O botão permanece desativado até o APK existir no caminho configurado.
+  }
+}
 
 function applyConfig() {
   const mappings = [
@@ -39,23 +66,7 @@ function applyConfig() {
     discordButton.addEventListener("click", () => window.open(CONFIG.discordUrl, "_blank", "noopener"));
   }
 
-  if (CONFIG.apkUrl) {
-    const downloadButton = document.querySelector(".download-button");
-    downloadButton.disabled = false;
-    downloadButton.textContent = `BAIXAR V${CONFIG.apkVersion}`;
-    downloadButton.title = "Baixar Log Horizon Voice";
-    downloadButton.addEventListener("click", () => {
-      const anchor = document.createElement("a");
-      anchor.href = CONFIG.apkUrl;
-      anchor.download = `LogHorizonVoice-v${CONFIG.apkVersion}.apk`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-    });
-
-    const note = document.querySelector(".download-note");
-    note.textContent = "Download oficial da versão release assinada para Android.";
-  }
+  configureDownload();
 }
 
 function showToast(message = "Copiado!") {
