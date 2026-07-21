@@ -4,7 +4,9 @@ const CONFIG = {
   bedrockPort: "10167",
   discordUrl: "https://discord.gg/wCxTJY3W7G",
   apkUrl: "downloads/LogHorizonVoice-v1.0.0.apk",
-  apkVersion: "1.0.0"
+  apkVersion: "1.0.0",
+  voiceWebUrl: "http://enx-cirion-84.enx.host:10057",
+  voiceTutorialUrl: "voz-pc.html"
 };
 
 const header = document.querySelector(".site-header");
@@ -39,6 +41,54 @@ async function configureDownload() {
   }
 }
 
+function configurePcVoice() {
+  if (!CONFIG.voiceTutorialUrl) return;
+
+  const appNavLink = navLinks?.querySelector('a[href="#voz"]');
+  if (appNavLink && !navLinks.querySelector('a[href="voz-pc.html"]')) {
+    const pcLink = document.createElement("a");
+    pcLink.href = CONFIG.voiceTutorialUrl;
+    pcLink.textContent = "Voz no PC";
+    appNavLink.insertAdjacentElement("afterend", pcLink);
+  }
+
+  const voiceCopy = document.querySelector(".voice-copy");
+  const downloadNote = document.querySelector(".download-note");
+  if (voiceCopy && downloadNote && !document.querySelector(".pc-voice-card")) {
+    const intro = voiceCopy.querySelector(":scope > p");
+    if (intro) {
+      intro.textContent = "Use o aplicativo oficial no Android ou entre pela interface web no computador para participar da voz por proximidade.";
+    }
+
+    const pcCard = document.createElement("div");
+    pcCard.className = "download-card pc-voice-card";
+    pcCard.innerHTML = `
+      <div class="android-mark" aria-hidden="true">PC</div>
+      <div><strong>Voz pelo navegador</strong><span>Windows • Chrome, Edge ou Opera GX</span></div>
+      <a class="button button-outline" href="${CONFIG.voiceTutorialUrl}">VER TUTORIAL</a>
+    `;
+    downloadNote.insertAdjacentElement("afterend", pcCard);
+
+    const list = voiceCopy.querySelector(".check-list");
+    if (list && !list.querySelector(".pc-voice-item")) {
+      const item = document.createElement("li");
+      item.className = "pc-voice-item";
+      item.innerHTML = "<span>✓</span> Acesso pelo navegador no computador";
+      list.appendChild(item);
+    }
+  }
+
+  const featureVoice = document.querySelector(".feature-grid .feature-card:nth-child(2) p");
+  if (featureVoice) {
+    featureVoice.textContent = "Converse com quem está perto usando o aplicativo Android ou a interface web no PC.";
+  }
+
+  const faqAnswers = document.querySelectorAll(".accordion details p");
+  if (faqAnswers[1]) {
+    faqAnswers[1].textContent = "A voz é opcional. No Android, use o aplicativo oficial. No computador, também é possível usar a interface web seguindo o tutorial do site.";
+  }
+}
+
 function applyConfig() {
   const mappings = [
     ["java-address", CONFIG.javaAddress],
@@ -61,11 +111,14 @@ function applyConfig() {
       link.rel = "noopener noreferrer";
     });
     const discordButton = document.querySelector(".discord-button");
-    discordButton.disabled = false;
-    discordButton.textContent = "ENTRAR NA COMUNIDADE";
-    discordButton.addEventListener("click", () => window.open(CONFIG.discordUrl, "_blank", "noopener"));
+    if (discordButton) {
+      discordButton.disabled = false;
+      discordButton.textContent = "ENTRAR NA COMUNIDADE";
+      discordButton.addEventListener("click", () => window.open(CONFIG.discordUrl, "_blank", "noopener"));
+    }
   }
 
+  configurePcVoice();
   configureDownload();
 }
 
