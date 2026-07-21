@@ -5,7 +5,7 @@ const CONFIG = {
   discordUrl: "https://discord.gg/wCxTJY3W7G",
   apkUrl: "downloads/LogHorizonVoice-v1.0.0.apk",
   apkVersion: "1.0.0",
-  voiceWebUrl: "http://enx-cirion-84.enx.host:10057",
+  voiceWebUrl: "http://enx-cirion-84.enx.host:10057/loghorizon.html",
   voiceTutorialUrl: "voz-pc.html"
 };
 
