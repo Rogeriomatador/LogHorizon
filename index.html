@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080711">
+  <meta name="description" content="Site oficial do servidor Minecraft Log Horizon — Java e Bedrock, comunidade, regras e aplicativo de voz.">
+  <meta property="og:title" content="Log Horizon — Servidor Minecraft">
+  <meta property="og:description" content="Entre em um mundo compartilhado por jogadores Java e Bedrock.">
+  <meta property="og:type" content="website">
+  <title>Log Horizon — Servidor Minecraft</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <header class="site-header" id="inicio">
+    <nav class="nav container" aria-label="Navegação principal">
+      <a class="brand" href="#inicio" aria-label="Log Horizon - início">
+        <span class="brand-mark" aria-hidden="true"><span>LH</span></span>
+        <span class="brand-copy"><strong>LOG HORIZON</strong><small>MINECRAFT SERVER</small></span>
+      </a>
+
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="main-menu" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="nav-links" id="main-menu">
+        <a href="#servidor">Servidor</a>
+        <a href="#recursos">Recursos</a>
+        <a href="#voz">Aplicativo</a>
+        <a href="#regras">Regras</a>
+        <a href="#faq">FAQ</a>
+        <a class="button button-small button-outline discord-link" href="#comunidade">Comunidade</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero section">
+      <div class="hero-grid container">
+        <div class="hero-copy reveal">
+          <div class="eyebrow"><span class="status-dot"></span> Java + Bedrock no mesmo mundo</div>
+          <h1>O horizonte não é o fim.<br><span>É onde a aventura começa.</span></h1>
+          <p class="hero-text">Um servidor Minecraft cross-platform criado para reunir amigos, formar histórias e construir algo que permaneça.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#servidor">Como entrar</a>
+            <a class="button button-ghost" href="#voz">Baixar app de voz</a>
+          </div>
+          <div class="hero-meta">
+            <div><strong>Cross-play</strong><span>Java e Bedrock</span></div>
+            <div><strong>Voz</strong><span>App próprio</span></div>
+            <div><strong>Comunidade</strong><span>Feito para durar</span></div>
+          </div>
+        </div>
+
+        <div class="hero-art reveal" aria-hidden="true">
+          <div class="portal-ring ring-one"></div>
+          <div class="portal-ring ring-two"></div>
+          <div class="portal-core">
+            <div class="floating-block block-one"></div>
+            <div class="floating-block block-two"></div>
+            <div class="floating-block block-three"></div>
+            <div class="horizon-line"></div>
+            <span class="portal-logo">LH</span>
+          </div>
+          <span class="spark spark-one"></span>
+          <span class="spark spark-two"></span>
+          <span class="spark spark-three"></span>
+        </div>
+      </div>
+      <a class="scroll-hint" href="#servidor" aria-label="Continuar para informações do servidor"><span></span>EXPLORE</a>
+    </section>
+
+    <section class="server-section section" id="servidor">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="kicker">CONEXÃO</span>
+          <h2>Entre no servidor</h2>
+          <p>Escolha sua edição. Os dados oficiais serão exibidos aqui assim que forem definidos.</p>
+        </div>
+
+        <div class="connection-grid">
+          <article class="connection-card reveal">
+            <div class="card-icon java-icon">J</div>
+            <div class="card-title-row"><div><span class="platform">Minecraft</span><h3>Java Edition</h3></div><span class="badge">PC</span></div>
+            <div class="server-field">
+              <span>Endereço</span>
+              <div><code id="java-address">Em configuração</code><button class="copy-button" data-copy-target="java-address" disabled>Copiar</button></div>
+            </div>
+            <p>Adicione o servidor pela lista de Multiplayer do Minecraft Java.</p>
+          </article>
+
+          <article class="connection-card featured reveal">
+            <span class="recommended">CROSS-PLAY</span>
+            <div class="card-icon bedrock-icon">B</div>
+            <div class="card-title-row"><div><span class="platform">Minecraft</span><h3>Bedrock Edition</h3></div><span class="badge">Mobile / Console</span></div>
+            <div class="server-field">
+              <span>Endereço</span>
+              <div><code id="bedrock-address">Em configuração</code><button class="copy-button" data-copy-target="bedrock-address" disabled>Copiar</button></div>
+            </div>
+            <div class="server-field compact">
+              <span>Porta</span>
+              <div><code id="bedrock-port">Em configuração</code><button class="copy-button" data-copy-target="bedrock-port" disabled>Copiar</button></div>
+            </div>
+          </article>
+        </div>
+
+        <div class="server-banner reveal">
+          <div><span class="live-indicator"></span><strong>Status do projeto</strong></div>
+          <p>Site oficial em construção. Endereço, eventos e novidades serão publicados aqui.</p>
+          <span class="status-pill">PREPARANDO</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="features section" id="recursos">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="kicker">EXPERIÊNCIA</span>
+          <h2>Um mundo, várias formas de jogar</h2>
+          <p>Uma base moderna para o servidor crescer junto com a comunidade.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card reveal"><span class="feature-number">01</span><div class="feature-symbol">⌘</div><h3>Cross-platform</h3><p>Jogadores do Java e do Bedrock dividindo a mesma aventura.</p></article>
+          <article class="feature-card reveal"><span class="feature-number">02</span><div class="feature-symbol">◉</div><h3>Voz por proximidade</h3><p>Converse com quem está perto usando o aplicativo Log Horizon Voice.</p></article>
+          <article class="feature-card reveal"><span class="feature-number">03</span><div class="feature-symbol">◇</div><h3>Comunidade</h3><p>Eventos, equipes, amizades e histórias construídas pelos jogadores.</p></article>
+          <article class="feature-card reveal"><span class="feature-number">04</span><div class="feature-symbol">✦</div><h3>Evolução constante</h3><p>Novos sistemas e melhorias chegando conforme o servidor cresce.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="voice-section section" id="voz">
+      <div class="container voice-grid">
+        <div class="phone-scene reveal" aria-hidden="true">
+          <div class="phone-glow"></div>
+          <div class="phone">
+            <div class="phone-speaker"></div>
+            <div class="phone-screen">
+              <div class="mini-brand"><span>LH</span> LOG HORIZON</div>
+              <div class="voice-orb"><i></i><i></i><i></i><strong>VOICE</strong></div>
+              <div class="connected-line"><span></span> Conectado</div>
+              <div class="mini-player"><div class="mini-avatar">U</div><div><strong>Ultra</strong><small>Falando...</small></div><div class="bars"><i></i><i></i><i></i><i></i></div></div>
+              <div class="mini-button">MICROFONE ATIVO</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="voice-copy reveal">
+          <span class="kicker">APLICATIVO OFICIAL</span>
+          <h2>Log Horizon <span>Voice</span></h2>
+          <p>O aplicativo complementar permite que jogadores Bedrock e mobile participem da voz por proximidade enquanto jogam.</p>
+          <ul class="check-list">
+            <li><span>✓</span> Comunicação por voz integrada ao servidor</li>
+            <li><span>✓</span> Interface leve e direta</li>
+            <li><span>✓</span> Desenvolvido para Android</li>
+            <li><span>✓</span> Download oficial e atualizações pelo site</li>
+          </ul>
+
+          <div class="download-card">
+            <div class="android-mark" aria-hidden="true">A</div>
+            <div><strong>Log Horizon Voice</strong><span>Android • Versão 1.0.0</span></div>
+            <button class="button button-primary download-button" type="button" disabled title="O APK release ainda será publicado">
+              APK EM BREVE
+            </button>
+          </div>
+          <p class="download-note">O download será ativado depois que o arquivo <code>app-release.apk</code> for publicado.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="steps-section section">
+      <div class="container">
+        <div class="section-heading reveal"><span class="kicker">PRIMEIROS PASSOS</span><h2>Do download ao jogo</h2></div>
+        <div class="steps">
+          <article class="step reveal"><span>1</span><div><h3>Baixe</h3><p>Baixe o APK somente por este site oficial.</p></div></article>
+          <article class="step reveal"><span>2</span><div><h3>Instale</h3><p>Autorize a instalação e permita o uso do microfone.</p></div></article>
+          <article class="step reveal"><span>3</span><div><h3>Entre</h3><p>Acesse o servidor Minecraft com sua conta.</p></div></article>
+          <article class="step reveal"><span>4</span><div><h3>Conecte</h3><p>Abra o Log Horizon Voice e participe da conversa.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="rules-section section" id="regras">
+      <div class="container rules-grid">
+        <div class="section-heading reveal"><span class="kicker">CONVIVÊNCIA</span><h2>Regras essenciais</h2><p>O objetivo é manter um ambiente divertido, justo e acolhedor para todos.</p></div>
+        <div class="rules-list reveal">
+          <article><span>01</span><div><h3>Respeite os jogadores</h3><p>Ofensas, discriminação, perseguição e assédio não fazem parte da comunidade.</p></div></article>
+          <article><span>02</span><div><h3>Jogue de forma justa</h3><p>Não use trapaças, clientes ilegais, exploits ou vantagens externas.</p></div></article>
+          <article><span>03</span><div><h3>Proteja a experiência</h3><p>Não destrua construções, roube ou prejudique outros jogadores fora das regras.</p></div></article>
+          <article><span>04</span><div><h3>Siga a equipe</h3><p>Respeite as orientações da moderação e utilize os canais corretos para denúncias.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq-section section" id="faq">
+      <div class="container narrow">
+        <div class="section-heading reveal"><span class="kicker">DÚVIDAS</span><h2>Perguntas frequentes</h2></div>
+        <div class="accordion reveal">
+          <details><summary>Jogadores Java e Bedrock podem jogar juntos?<span>+</span></summary><p>Sim. O Log Horizon foi preparado como um servidor cross-platform, permitindo que as duas edições compartilhem o mesmo mundo.</p></details>
+          <details><summary>O aplicativo é obrigatório?<span>+</span></summary><p>O aplicativo é necessário apenas para jogadores que desejam usar o sistema de voz compatível no Android. O acesso normal ao servidor continua separado.</p></details>
+          <details><summary>O aplicativo é seguro?<span>+</span></summary><p>Baixe sempre por este site oficial. O APK distribuído aqui é a versão release assinada do projeto Log Horizon Voice.</p></details>
+          <details><summary>Onde recebo suporte?<span>+</span></summary><p>O link oficial da comunidade será adicionado nesta página para dúvidas, suporte e anúncios.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="community-section section" id="comunidade">
+      <div class="container community-card reveal">
+        <div><span class="kicker">COMUNIDADE</span><h2>A aventura fica melhor em grupo.</h2><p>Entre na comunidade para acompanhar anúncios, eventos, atualizações e encontrar outros jogadores.</p></div>
+        <button class="button button-light discord-button" type="button" disabled>LINK EM BREVE</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-grid">
+      <a class="brand" href="#inicio"><span class="brand-mark"><span>LH</span></span><span class="brand-copy"><strong>LOG HORIZON</strong><small>MINECRAFT SERVER</small></span></a>
+      <p>Projeto independente de comunidade. Não afiliado à Mojang Studios ou Microsoft.</p>
+      <span>© <span id="current-year"></span> Log Horizon</span>
+    </div>
+  </footer>
+
+  <div class="toast" role="status" aria-live="polite">Copiado!</div>
+  <script src="script.js"></script>
+</body>
+</html>
