@@ -1,0 +1,17 @@
+{
+  "name": "Log Horizon — Servidor Minecraft",
+  "short_name": "Log Horizon",
+  "description": "Site oficial do servidor Minecraft Log Horizon.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#080711",
+  "theme_color": "#080711",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
