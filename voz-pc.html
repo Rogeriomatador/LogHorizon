@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080711">
+  <meta name="description" content="Tutorial oficial para usar o chat de voz do servidor Log Horizon pelo navegador no PC.">
+  <title>Voz no PC — Log Horizon</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Unbounded:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#080711; --panel:#11101e; --panel2:#17152a; --text:#f7f5ff; --muted:#aaa4bd; --purple:#8e5cff; --cyan:#45d9ff; --line:rgba(255,255,255,.10); --good:#59e391; --warn:#ffc665; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; min-height:100vh; font-family:Inter,system-ui,sans-serif; color:var(--text); background:radial-gradient(circle at 80% 0%,rgba(142,92,255,.18),transparent 35%),radial-gradient(circle at 10% 50%,rgba(69,217,255,.09),transparent 30%),var(--bg); }
+    a { color:inherit; }
+    .container { width:min(1120px,calc(100% - 34px)); margin:auto; }
+    header { position:sticky; top:0; z-index:10; border-bottom:1px solid var(--line); background:rgba(8,7,17,.82); backdrop-filter:blur(18px); }
+    nav { min-height:76px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .mark { width:44px; height:44px; display:grid; place-items:center; border-radius:13px; font-family:Unbounded,sans-serif; font-size:13px; font-weight:800; background:linear-gradient(135deg,var(--purple),var(--cyan)); box-shadow:0 0 30px rgba(142,92,255,.3); }
+    .brand strong { display:block; font-family:Unbounded,sans-serif; font-size:14px; letter-spacing:.04em; }
+    .brand small { display:block; margin-top:3px; color:var(--muted); font-size:10px; letter-spacing:.15em; }
+    .back { text-decoration:none; color:var(--muted); font-weight:700; }
+    .back:hover { color:#fff; }
+    main { padding:70px 0 90px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:9px; padding:8px 12px; border:1px solid rgba(89,227,145,.25); border-radius:999px; color:#bfffd5; background:rgba(89,227,145,.08); font-size:13px; font-weight:700; }
+    .dot { width:8px; height:8px; border-radius:50%; background:var(--good); box-shadow:0 0 14px var(--good); }
+    h1 { max-width:900px; margin:22px 0 18px; font-family:Unbounded,sans-serif; font-size:clamp(38px,7vw,78px); line-height:1.03; letter-spacing:-.05em; }
+    h1 span { color:transparent; background:linear-gradient(90deg,var(--purple),var(--cyan)); background-clip:text; }
+    .lead { max-width:760px; margin:0; color:var(--muted); font-size:18px; line-height:1.75; }
+    .launch { margin-top:32px; padding:22px; display:flex; align-items:center; justify-content:space-between; gap:22px; border:1px solid rgba(142,92,255,.35); border-radius:22px; background:linear-gradient(135deg,rgba(142,92,255,.12),rgba(69,217,255,.06)); }
+    .launch code { display:block; margin-top:7px; color:#d9d1ff; font-size:14px; word-break:break-all; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:50px; padding:0 20px; border:0; border-radius:13px; text-decoration:none; font-weight:800; cursor:pointer; white-space:nowrap; background:linear-gradient(135deg,var(--purple),#6b8cff); box-shadow:0 14px 34px rgba(98,85,255,.25); }
+    .button:hover { transform:translateY(-2px); }
+    .section { margin-top:72px; }
+    .kicker { color:var(--cyan); font-size:12px; font-weight:800; letter-spacing:.18em; }
+    h2 { margin:9px 0 14px; font-family:Unbounded,sans-serif; font-size:clamp(27px,4vw,43px); letter-spacing:-.035em; }
+    .section-intro { max-width:720px; color:var(--muted); line-height:1.7; }
+    .steps { display:grid; gap:16px; margin-top:28px; }
+    .step { display:grid; grid-template-columns:56px 1fr; gap:18px; padding:24px; border:1px solid var(--line); border-radius:20px; background:rgba(17,16,30,.82); }
+    .number { width:48px; height:48px; display:grid; place-items:center; border-radius:15px; font-family:Unbounded,sans-serif; font-weight:800; background:rgba(142,92,255,.14); color:#cfc0ff; border:1px solid rgba(142,92,255,.28); }
+    .step h3 { margin:2px 0 9px; font-size:20px; }
+    .step p { margin:0; color:var(--muted); line-height:1.7; }
+    .code-row { margin-top:14px; display:flex; align-items:center; gap:10px; padding:12px 13px; border-radius:12px; background:#090813; border:1px solid var(--line); }
+    .code-row code { flex:1; color:#ddd6ff; overflow:auto; white-space:nowrap; }
+    .copy { border:0; border-radius:9px; padding:8px 11px; color:#fff; background:#282442; cursor:pointer; font-weight:700; }
+    .browsers { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:15px; }
+    .browser { padding:15px; border-radius:14px; background:var(--panel2); border:1px solid var(--line); }
+    .browser strong { display:block; margin-bottom:8px; }
+    .browser code { color:#cfc8e3; font-size:12px; word-break:break-all; }
+    .warning { margin-top:24px; padding:20px; border:1px solid rgba(255,198,101,.32); border-radius:17px; background:rgba(255,198,101,.08); color:#ffe0aa; line-height:1.65; }
+    .trouble { display:grid; grid-template-columns:repeat(2,1fr); gap:15px; margin-top:25px; }
+    .trouble article { padding:20px; border:1px solid var(--line); border-radius:17px; background:rgba(17,16,30,.72); }
+    .trouble h3 { margin:0 0 8px; }
+    .trouble p { margin:0; color:var(--muted); line-height:1.6; }
+    footer { padding:28px 0; border-top:1px solid var(--line); color:var(--muted); text-align:center; }
+    .toast { position:fixed; right:20px; bottom:20px; padding:12px 16px; border-radius:12px; background:#fff; color:#111; font-weight:800; opacity:0; transform:translateY(12px); pointer-events:none; transition:.2s; }
+    .toast.show { opacity:1; transform:none; }
+    @media (max-width:760px) { main{padding-top:48px}.launch{align-items:stretch;flex-direction:column}.button{width:100%}.browsers,.trouble{grid-template-columns:1fr}.step{grid-template-columns:1fr}.number{width:44px;height:44px} }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="container">
+      <a class="brand" href="index.html"><span class="mark">LH</span><span><strong>LOG HORIZON</strong><small>VOICE WEB</small></span></a>
+      <a class="back" href="index.html">← Voltar ao site</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="eyebrow"><span class="dot"></span> Voz por proximidade pelo navegador</div>
+    <h1>Entre na voz pelo <span>seu PC.</span></h1>
+    <p class="lead">Não é necessário instalar o aplicativo Android no computador. O navegador se conecta à interface de voz do próprio servidor Log Horizon.</p>
+
+    <section class="launch">
+      <div><strong>Painel oficial de voz</strong><code>http://enx-cirion-84.enx.host:10057</code></div>
+      <a class="button" href="http://enx-cirion-84.enx.host:10057" target="_blank" rel="noopener noreferrer">ABRIR VOZ NO PC</a>
+    </section>
+
+    <section class="section">
+      <span class="kicker">CONFIGURAÇÃO INICIAL</span>
+      <h2>Faça uma vez e fique pronto</h2>
+      <p class="section-intro">Como a interface de voz usa HTTP, navegadores Chromium normalmente exigem que esse endereço seja marcado manualmente como confiável para liberar o microfone.</p>
+
+      <div class="steps">
+        <article class="step">
+          <span class="number">1</span>
+          <div><h3>Crie sua senha dentro do Minecraft</h3><p>Entre no servidor e execute o comando abaixo no chat. Use uma senha criada somente para o Log Horizon Voice.</p><div class="code-row"><code>/svg pswd SUA_SENHA</code><button class="copy" data-copy="/svg pswd SUA_SENHA">Copiar</button></div></div>
+        </article>
+
+        <article class="step">
+          <span class="number">2</span>
+          <div><h3>Abra a configuração do navegador</h3><p>Cole o endereço correspondente na barra do navegador. Opera GX, Chrome e Edge são baseados em Chromium.</p>
+            <div class="browsers">
+              <div class="browser"><strong>Google Chrome</strong><code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code></div>
+              <div class="browser"><strong>Microsoft Edge</strong><code>edge://flags/#unsafely-treat-insecure-origin-as-secure</code></div>
+              <div class="browser"><strong>Opera GX</strong><code>opera://flags/#unsafely-treat-insecure-origin-as-secure</code></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="step">
+          <span class="number">3</span>
+          <div><h3>Marque o endereço como seguro</h3><p>Na opção <strong>Insecure origins treated as secure</strong>, cole exatamente o endereço abaixo, selecione <strong>Enabled</strong> e pressione <strong>Relaunch</strong>.</p><div class="code-row"><code>http://enx-cirion-84.enx.host:10057</code><button class="copy" data-copy="http://enx-cirion-84.enx.host:10057">Copiar</button></div></div>
+        </article>
+
+        <article class="step">
+          <span class="number">4</span>
+          <div><h3>Permita o microfone</h3><p>Abra o painel de voz novamente. Quando o navegador solicitar, escolha <strong>Permitir</strong> para o microfone. Selecione também o microfone e o alto-falante corretos dentro da página.</p></div>
+        </article>
+
+        <article class="step">
+          <span class="number">5</span>
+          <div><h3>Conecte com sua conta do jogo</h3><p>Informe o nome usado no Minecraft e a senha criada com <code>/svg pswd</code>. Mantenha a aba aberta enquanto estiver jogando.</p></div>
+        </article>
+      </div>
+
+      <div class="warning"><strong>Aviso:</strong> use uma senha exclusiva para a voz e nunca reutilize a senha do e-mail, Microsoft, Discord ou outras contas. A interface atual do plugin utiliza HTTP.</div>
+    </section>
+
+    <section class="section">
+      <span class="kicker">SOLUÇÃO DE PROBLEMAS</span>
+      <h2>Quando algo não funcionar</h2>
+      <div class="trouble">
+        <article><h3>Microfone não aparece</h3><p>Confira se o endereço com <code>http://</code> e a porta <code>10057</code> foram colocados na flag, feche todas as janelas do navegador e abra novamente.</p></article>
+        <article><h3>Senha inválida</h3><p>Volte ao Minecraft e execute <code>/svg pswd</code> com uma nova senha. Depois tente entrar novamente pelo navegador.</p></article>
+        <article><h3>Página não abre</h3><p>Verifique se o servidor está online. A interface depende da alocação TCP da porta <code>10057</code>.</p></article>
+        <article><h3>Não escuto ninguém</h3><p>Selecione a saída de áudio correta, confirme o volume do navegador e veja se a aba não está silenciada no Windows.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <footer>Log Horizon Voice Web • Use apenas os endereços publicados no site oficial.</footer>
+  <div class="toast" role="status">Copiado!</div>
+  <script>
+    const toast = document.querySelector('.toast');
+    document.querySelectorAll('[data-copy]').forEach((button) => button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy);
+        toast.textContent = 'Copiado!';
+      } catch {
+        toast.textContent = 'Selecione e copie manualmente';
+      }
+      toast.classList.add('show');
+      clearTimeout(window.copyTimer);
+      window.copyTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }));
+  </script>
+</body>
+</html>
