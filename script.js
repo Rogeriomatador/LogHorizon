@@ -42,14 +42,46 @@ async function configureDownload() {
 }
 
 function configurePcVoice() {
-  if (!CONFIG.voiceTutorialUrl) return;
+  if (!CONFIG.voiceTutorialUrl || !CONFIG.voiceWebUrl) return;
+
+  const closeMobileMenu = () => {
+    navLinks?.classList.remove("open");
+    menuButton?.classList.remove("active");
+    menuButton?.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  };
 
   const appNavLink = navLinks?.querySelector('a[href="#voz"]');
   if (appNavLink && !navLinks.querySelector('a[href="voz-pc.html"]')) {
-    const pcLink = document.createElement("a");
-    pcLink.href = CONFIG.voiceTutorialUrl;
-    pcLink.textContent = "Voz no PC";
-    appNavLink.insertAdjacentElement("afterend", pcLink);
+    const tutorialLink = document.createElement("a");
+    tutorialLink.href = CONFIG.voiceTutorialUrl;
+    tutorialLink.textContent = "Tutorial da voz";
+    tutorialLink.addEventListener("click", closeMobileMenu);
+    appNavLink.insertAdjacentElement("afterend", tutorialLink);
+  }
+
+  if (navLinks && !navLinks.querySelector(".voice-direct-link")) {
+    const directLink = document.createElement("a");
+    directLink.className = "button button-small button-primary voice-direct-link";
+    directLink.href = CONFIG.voiceWebUrl;
+    directLink.target = "_blank";
+    directLink.rel = "noopener noreferrer";
+    directLink.textContent = "ENTRAR NA VOZ";
+    directLink.addEventListener("click", closeMobileMenu);
+    const communityLink = navLinks.querySelector(".discord-link");
+    navLinks.insertBefore(directLink, communityLink || null);
+  }
+
+  const heroActions = document.querySelector(".hero-actions");
+  if (heroActions && !heroActions.querySelector(".voice-direct-hero")) {
+    const heroVoice = document.createElement("a");
+    heroVoice.className = "button button-primary voice-direct-hero";
+    heroVoice.href = CONFIG.voiceWebUrl;
+    heroVoice.target = "_blank";
+    heroVoice.rel = "noopener noreferrer";
+    heroVoice.textContent = "Entrar na voz";
+    heroVoice.title = "Abrir a página oficial de voz do Log Horizon";
+    heroActions.appendChild(heroVoice);
   }
 
   const voiceCopy = document.querySelector(".voice-copy");
@@ -65,7 +97,10 @@ function configurePcVoice() {
     pcCard.innerHTML = `
       <div class="android-mark" aria-hidden="true">PC</div>
       <div><strong>Voz pelo navegador</strong><span>Windows • Chrome, Edge ou Opera GX</span></div>
-      <a class="button button-outline" href="${CONFIG.voiceTutorialUrl}">VER TUTORIAL</a>
+      <div class="pc-voice-actions" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        <a class="button button-primary" href="${CONFIG.voiceWebUrl}" target="_blank" rel="noopener noreferrer">ENTRAR NA VOZ</a>
+        <a class="button button-outline" href="${CONFIG.voiceTutorialUrl}">COMO CONFIGURAR</a>
+      </div>
     `;
     downloadNote.insertAdjacentElement("afterend", pcCard);
 
@@ -73,19 +108,19 @@ function configurePcVoice() {
     if (list && !list.querySelector(".pc-voice-item")) {
       const item = document.createElement("li");
       item.className = "pc-voice-item";
-      item.innerHTML = "<span>✓</span> Acesso pelo navegador no computador";
+      item.innerHTML = "<span>✓</span> Acesso direto à voz pelo navegador no computador";
       list.appendChild(item);
     }
   }
 
   const featureVoice = document.querySelector(".feature-grid .feature-card:nth-child(2) p");
   if (featureVoice) {
-    featureVoice.textContent = "Converse com quem está perto usando o aplicativo Android ou a interface web no PC.";
+    featureVoice.textContent = "Converse com quem está perto usando o aplicativo Android ou entrando diretamente na voz pelo PC.";
   }
 
   const faqAnswers = document.querySelectorAll(".accordion details p");
   if (faqAnswers[1]) {
-    faqAnswers[1].textContent = "A voz é opcional. No Android, use o aplicativo oficial. No computador, também é possível usar a interface web seguindo o tutorial do site.";
+    faqAnswers[1].textContent = "A voz é opcional. No Android, use o aplicativo oficial. No computador, clique em Entrar na voz e siga o tutorial de configuração na primeira utilização.";
   }
 }
 
