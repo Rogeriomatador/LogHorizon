@@ -1,9 +1,9 @@
 {
   "enabled": false,
-  "versionCode": 4,
+  "versionCode": 5,
   "versionName": "0.4.0",
   "apkUrl": "https://rogeriomatador.github.io/LogHorizon/downloads/LogHorizonVoice-latest.apk",
   "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "mandatory": false,
-  "releaseNotes": "Atualizador integrado, microfone flutuante minimalista, central de diagnóstico e melhorias de estabilidade."
+  "releaseNotes": "Nova interface oficial, bolha completa e microfone flutuante independentes, teste de microfone, diagnóstico de áudio, atualização integrada e melhorias de estabilidade."
 }
