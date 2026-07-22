@@ -3,8 +3,8 @@ const CONFIG = {
   bedrockAddress: "enx-cirion-84.enx.host",
   bedrockPort: "10167",
   discordUrl: "https://discord.gg/wCxTJY3W7G",
-  apkUrl: "downloads/LogHorizonVoice-v1.0.0.apk",
-  apkVersion: "1.0.0",
+  apkUrl: "downloads/LogHorizonVoice-latest.apk",
+  apkVersion: "0.4.0",
   voiceWebUrl: "http://enx-cirion-84.enx.host:10057/loghorizon.html",
   voiceTutorialUrl: "voz-pc.html"
 };
