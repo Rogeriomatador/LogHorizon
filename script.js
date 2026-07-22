@@ -31,7 +31,7 @@ async function configureDownload() {
     downloadButton.addEventListener("click", () => {
       const anchor = document.createElement("a");
       anchor.href = CONFIG.apkUrl;
-      anchor.download = `LogHorizonVoice-v${CONFIG.apkVersion}.apk`;
+      anchor.download = "LogHorizonVoice-latest.apk";
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
