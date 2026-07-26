@@ -1,0 +1,12 @@
+                ✦ LOG HORIZON ✦
+      Uma nova aventura começa a cada horizonte
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+              Bem-vindo, Jogador
+        Java + Bedrock • RPG • Sobrevivência
+
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         PODER 13 │ AGRICULTURA 1
+      Use /skills para acompanhar sua evolução
+      ✦ Explore • Evolua • Construa sua história ✦
+
+Observação: no jogo, o título e as linhas usam gradientes azul/violeta e azul/ciano.
