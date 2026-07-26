@@ -1,0 +1,46 @@
+name: Build SimpleCustomTab Config
+
+on:
+  pull_request:
+    paths:
+      - 'simplecustomtab-loghorizon/**'
+      - '.github/workflows/build-simplecustomtab-config.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validar configuração
+        run: |
+          grep -q 'header:' simplecustomtab-loghorizon/config.yml
+          grep -q 'footer:' simplecustomtab-loghorizon/config.yml
+          grep -q 'player:' simplecustomtab-loghorizon/config.yml
+          grep -q 'auraskills_power' simplecustomtab-loghorizon/config.yml
+          grep -q 'auraskills_farming' simplecustomtab-loghorizon/config.yml
+          grep -q 'luckperms_prefix' simplecustomtab-loghorizon/config.yml
+
+      - name: Preparar arquivos diretos
+        run: |
+          mkdir -p dist
+          cp simplecustomtab-loghorizon/config.yml dist/config.yml
+          cp simplecustomtab-loghorizon/INSTALACAO.txt dist/INSTALACAO.txt
+          cp simplecustomtab-loghorizon/PREVIA.txt dist/PREVIA.txt
+          sha256sum dist/config.yml > dist/SHA256.txt
+          if find dist -maxdepth 1 -type f \( -name '*.zip' -o -name '*.rar' -o -name '*.7z' -o -name '*.tar.gz' \) | grep -q .; then
+            echo 'Arquivo compactado interno encontrado.'
+            exit 1
+          fi
+          test "$(find dist -maxdepth 1 -type f | wc -l)" -eq 4
+
+      - name: Enviar pacote
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizon-SimpleCustomTab-1.1.1-CONFIG
+          path: dist/*
+          if-no-files-found: error
