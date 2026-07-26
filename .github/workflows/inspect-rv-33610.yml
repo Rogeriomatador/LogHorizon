@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   inspect:
@@ -91,7 +91,7 @@ jobs:
         run: |
           curl -fsSL -o cfr.jar https://www.benf.org/other/cfr/cfr-0.152.jar
 
-      - name: Decompile relevant classes
+      - name: Decompile exact JAR
         run: |
           mkdir -p inspection/decompiled
           java -jar cfr.jar rv.jar \
@@ -101,10 +101,35 @@ jobs:
           find inspection/decompiled -type f | grep -Ei 'GiftManager|GiftCategory|ExpectingManager|IVillagerNPC|INMSConverter|RealisticVillagers.java' | sort > inspection/decompiled-files.txt
           echo '=== DECOMPILED FILES ==='
           cat inspection/decompiled-files.txt
-          while IFS= read -r file; do
-            echo "===== $file ====="
-            sed -n '1,320p' "$file"
-          done < inspection/decompiled-files.txt
+
+      - name: Publish relevant exact sources to temporary branch
+        run: |
+          rm -rf /tmp/rv-inspection
+          mkdir -p /tmp/rv-inspection/source/manager /tmp/rv-inspection/source/entity /tmp/rv-inspection/source/nms /tmp/rv-inspection/resources
+
+          root='inspection/decompiled/me/matsubara/realisticvillagers'
+          cp -R "$root/manager/gift" /tmp/rv-inspection/source/manager/
+          cp "$root/manager/ExpectingManager.java" /tmp/rv-inspection/source/manager/
+          cp "$root/entity/IVillagerNPC.java" /tmp/rv-inspection/source/entity/
+          cp "$root/nms/INMSConverter.java" /tmp/rv-inspection/source/nms/
+          cp "$root/RealisticVillagers.java" /tmp/rv-inspection/source/
+          cp inspection/javap.txt /tmp/rv-inspection/
+          cp relevant-entries.txt /tmp/rv-inspection/
+          cp -R inspection/resources/. /tmp/rv-inspection/resources/ || true
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin inspect-rv-33610-20260726
+          git checkout -B inspect-rv-33610-20260726 origin/inspect-rv-33610-20260726
+          rm -rf rv-inspection
+          cp -R /tmp/rv-inspection rv-inspection
+          git add rv-inspection
+          if git diff --cached --quiet; then
+            echo 'Inspection files already published.'
+            exit 0
+          fi
+          git commit -m 'Publish exact RealisticVillagers 3.3.6.10 inspection'
+          git push origin HEAD:inspect-rv-33610-20260726
 
       - name: Upload inspection artifact
         uses: actions/upload-artifact@v4
