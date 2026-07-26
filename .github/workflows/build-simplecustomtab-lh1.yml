@@ -54,7 +54,7 @@ jobs:
           grep -q '<displayname>' simplecustomtab-lh1/config.yml
           grep -q '<online>/<maxplayers>' simplecustomtab-lh1/config.yml
 
-      - name: Gerar pacote direto
+      - name: Preparar arquivos diretos
         run: |
           mkdir -p dist
           JAR="$(find upstream/target -maxdepth 1 -type f -name 'SimpleCustomTab-1.1.1-LH1.jar' -print -quit)"
@@ -64,12 +64,8 @@ jobs:
           cp simplecustomtab-lh1/PREVIA.txt dist/PREVIA.txt
           cd dist
           sha256sum SimpleCustomTab-1.1.1-LH1.jar config.yml INSTALACAO.txt PREVIA.txt > SHA256.txt
-          zip -9 LogHorizon-SimpleCustomTab-1.1.1-LH1.zip \
-            SimpleCustomTab-1.1.1-LH1.jar config.yml INSTALACAO.txt PREVIA.txt SHA256.txt
-          unzip -t LogHorizon-SimpleCustomTab-1.1.1-LH1.zip
           python3 - <<'PY'
-          import zipfile
-          package = 'LogHorizon-SimpleCustomTab-1.1.1-LH1.zip'
+          from pathlib import Path
           expected = {
               'SimpleCustomTab-1.1.1-LH1.jar',
               'config.yml',
@@ -77,16 +73,20 @@ jobs:
               'PREVIA.txt',
               'SHA256.txt',
           }
-          with zipfile.ZipFile(package) as archive:
-              names = set(archive.namelist())
-              assert names == expected, names
-              assert not any(name.lower().endswith(('.zip', '.rar', '.7z', '.tar', '.gz')) for name in names)
-          print('Pacote final validado:', sorted(names))
+          names = {p.name for p in Path('.').iterdir() if p.is_file()}
+          assert names == expected, names
+          assert not any(name.lower().endswith(('.zip', '.rar', '.7z', '.tar', '.gz')) for name in names)
+          print('Arquivos diretos validados:', sorted(names))
           PY
 
-      - name: Enviar artefato
+      - name: Enviar ZIP final sem arquivo compactado interno
         uses: actions/upload-artifact@v4
         with:
-          name: LogHorizon-SimpleCustomTab-1.1.1-LH1
-          path: dist/LogHorizon-SimpleCustomTab-1.1.1-LH1.zip
+          name: LogHorizon-SimpleCustomTab-1.1.1-LH1-DIRETO
+          path: |
+            dist/SimpleCustomTab-1.1.1-LH1.jar
+            dist/config.yml
+            dist/INSTALACAO.txt
+            dist/PREVIA.txt
+            dist/SHA256.txt
           if-no-files-found: error
