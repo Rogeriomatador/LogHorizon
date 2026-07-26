@@ -1,6 +1,7 @@
 name: Build GardenPlus RV 1.1.0
 
 on:
+  workflow_call:
   push:
     branches:
       - inspect-rv-33610-20260726
@@ -178,9 +179,6 @@ realistic-villagers:
           /**
            * Integra exclusivamente frutas e sementes reais do GardenPlus ao fluxo de
            * presentes por DROP do RealisticVillagers 3.3.6.10.
-           *
-           * O listener encerra o estado de espera antes do listener HIGHEST nativo.
-           * Assim o mesmo presente nunca é processado duas vezes nem vira presente ruim.
            */
           final class RealisticVillagersGiftIntegration implements Listener {
 
@@ -245,7 +243,6 @@ realistic-villagers:
 
                   int rawReputation = calculateReputation(npc, player, villagerEntity, stack, species, fruit, seeds);
 
-                  // Impede que o listener nativo HIGHEST processe o mesmo item novamente.
                   expectingManager.remove(thrower);
                   npc.setGiftDropped(false);
                   npc.stopExpecting();
