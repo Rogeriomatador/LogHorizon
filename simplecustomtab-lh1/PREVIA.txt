@@ -1,0 +1,15 @@
+                 ◆ LOG HORIZON ◆
+          RPG Survival • Java + Bedrock
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━
+             Bem-vindo, Jogador
+              1/50 online • 19ms
+
+       ━━━━━━━━━━━━━━━━━━━━━━━━━━
+        ⚔ PODER 13 • ✦ AGRICULTURA 1
+ Use /skills para evoluir e desbloquear habilidades
+   Seu progresso escreve o próximo horizonte.
+
+Linha dos jogadores:
+[Cargo] Rogeriomartins1 │ ⚔ 13 │ 19ms
+
+No jogo, o título e as divisórias usam gradientes em azul, ciano e violeta. Cada jogador recebe os próprios valores de nome, ping, Poder e Agricultura.
