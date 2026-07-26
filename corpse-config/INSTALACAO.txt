@@ -1,0 +1,19 @@
+LOG HORIZON - CORPSE 1.3.1
+
+1. Desligue completamente o servidor.
+2. Mantenha o arquivo Corpses-1.3.1.jar diretamente em plugins/.
+3. Substitua o arquivo:
+   plugins/Corpse/config.yml
+   pelo config.yml deste pacote.
+4. Ligue o servidor. Não use /reload.
+
+COMPORTAMENTO
+- Ao morrer, os itens não caem no chão: ficam guardados no cadáver.
+- O XP também fica guardado.
+- Ao clicar com o botão direito no cadáver, itens e XP são liberados no local.
+- O cadáver desaparece depois da recuperação.
+- O cadáver fica invulnerável e imóvel para evitar perda acidental.
+- lifespan -1 faz o cadáver permanecer até ser recuperado.
+
+ATENÇÃO
+A versão original 1.3.1 não verifica o dono do cadáver. Portanto, qualquer jogador que clicar nele pode liberar os itens. Uma proteção exclusiva do proprietário exige uma modificação separada no JAR.
