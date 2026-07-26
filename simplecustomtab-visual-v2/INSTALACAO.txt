@@ -1,0 +1,22 @@
+LOG HORIZON - SIMPLECUSTOMTAB 1.1.1 - VISUAL V2
+
+INSTALAÇÃO
+1. Desligue completamente o servidor.
+2. Mantenha o arquivo plugins/SimpleCustomTab-1.1.1.jar.
+3. Substitua somente plugins/SimpleCustomTab/config.yml pelo config.yml deste pacote.
+4. Ligue o servidor normalmente.
+
+RECARREGAMENTO
+- Para alterações pequenas futuras, use /sctreload.
+- Para esta troca completa, prefira reiniciar o servidor.
+
+O QUE FOI MELHORADO
+- Título com gradiente azul e violeta.
+- Frase temática do Log Horizon.
+- Melhor separação visual entre identidade, jogador e atributos.
+- Poder e Agricultura destacados com cores próprias.
+- Linha dos jogadores com prefixo do LuckPerms e ping.
+- Animações desligadas para evitar piscadas no Bedrock.
+
+OBSERVAÇÃO
+- O pacote possui arquivos diretos. Não há outro ZIP, RAR ou pasta compactada dentro dele.
