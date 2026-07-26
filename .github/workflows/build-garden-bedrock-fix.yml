@@ -1,0 +1,35 @@
+name: Build Garden Bedrock Fix
+
+on:
+  pull_request:
+    paths:
+      - 'garden-bedrock-fix/**'
+      - '.github/workflows/build-garden-bedrock-fix.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Gerar e validar pacote
+        run: python garden-bedrock-fix/build.py
+
+      - name: Listar conteúdo do ZIP
+        run: unzip -l dist/LogHorizon-Garden-Bedrock-FIX2.zip
+
+      - name: Enviar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizon-Garden-Bedrock-FIX2
+          path: dist/LogHorizon-Garden-Bedrock-FIX2.zip
+          if-no-files-found: error
