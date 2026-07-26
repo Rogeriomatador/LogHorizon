@@ -1,0 +1,17 @@
+PRÉVIA APROXIMADA DA TAB
+
+LOG HORIZON
+Servidor RPG - Java e Bedrock
+----------------------------
+
+[Cargo] NomeDoJogador [Poder]
+
+----------------------------
+Poder: 25 | Agricultura: 18
+Use /skills para acompanhar sua evolução
+
+OBSERVAÇÕES
+- As cores são aplicadas pelo MiniMessage dentro do Minecraft.
+- O cargo vem do prefixo configurado no LuckPerms.
+- O número entre colchetes é o poder geral do AuraSkills.
+- O rodapé é personalizado para quem estiver visualizando a TAB.
