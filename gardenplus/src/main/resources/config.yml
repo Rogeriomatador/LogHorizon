@@ -1,0 +1,85 @@
+# Log Horizon - GardenPlus
+# Compatível com Garden 2.0.1 e AuraSkills 2.3.12.
+# As frutas continuam sendo alimentos normais. Este complemento não adiciona efeitos de poção.
+
+aura-skills:
+  enabled: true
+  xp:
+    strawberry: 1.5
+    raspberry: 1.5
+    blueberry: 2.0
+    cranberry: 2.0
+    grape: 3.0
+    apple: 4.0
+    cherry: 4.0
+    lemon: 4.0
+    lime: 4.0
+    orange: 4.0
+    peach: 4.0
+
+seed-rarity:
+  enabled: true
+  # O Garden primeiro escolhe uma espécie. Esta porcentagem decide se a semente permanece no chão.
+  acceptance-percent:
+    strawberry: 100.0
+    raspberry: 100.0
+    blueberry: 65.0
+    cranberry: 65.0
+    grape: 40.0
+    apple: 35.0
+    cherry: 35.0
+    lemon: 18.0
+    lime: 18.0
+    orange: 18.0
+    peach: 18.0
+
+harvest-yield:
+  # Quantidade total obtida em uma colheita válida, antes dos bônus de planta especial e sorte.
+  strawberry: { min: 1, max: 2 }
+  raspberry: { min: 1, max: 3 }
+  blueberry: { min: 1, max: 3 }
+  cranberry: { min: 1, max: 3 }
+  grape: { min: 2, max: 4 }
+  apple: { min: 2, max: 5 }
+  cherry: { min: 2, max: 5 }
+  lemon: { min: 2, max: 5 }
+  lime: { min: 2, max: 5 }
+  orange: { min: 3, max: 6 }
+  peach: { min: 3, max: 6 }
+
+special-plants:
+  enabled: true
+  fertile-chance-percent: 4.0
+  ancient-chance-percent: 0.75
+  fertile-extra-fruit: 1
+  ancient-extra-fruit: 2
+  ancient-xp-multiplier: 1.5
+
+quality:
+  enabled: true
+  quality-percent: 13.0
+  perfect-percent: 2.0
+  fertile-quality-bonus: 5.0
+  fertile-perfect-bonus: 1.0
+  ancient-quality-bonus: 12.0
+  ancient-perfect-bonus: 4.0
+  quality-prefix: '<gold>★ Qualidade: </gold>'
+  perfect-prefix: '<aqua>✦ Perfeita: </aqua>'
+  quality-lore: '<gray>Uma fruta de qualidade superior.</gray>'
+  perfect-lore: '<aqua>Uma colheita excepcional e muito rara.</aqua>'
+
+farming-luck:
+  enabled: true
+  base-chance-percent: 2.0
+  chance-per-farming-level: 0.15
+  max-chance-percent: 12.0
+  extra-fruit: 1
+
+anti-abuse:
+  harvest-cooldown-ticks: 3
+  scan-radius: 2.25
+
+messages:
+  fertile-plant: '<green>Esta muda nasceu como uma <bold>Planta Fértil</bold>!</green>'
+  ancient-plant: '<gold>Esta muda se tornou uma <bold>Planta Antiga</bold>!</gold>'
+  reloaded: '<green>LogHorizonGardenPlus recarregado.</green>'
