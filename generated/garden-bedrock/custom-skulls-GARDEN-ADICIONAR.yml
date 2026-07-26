@@ -1,0 +1,13 @@
+# Log Horizon - texturas das frutas do Garden
+# NÃO substitua seu custom-skulls.yml se ele já tiver outras cabeças.
+# Copie somente as linhas com hífen para dentro da seção skin-hashes existente.
+skin-hashes:
+  - 1c9a8315fdc307b8315918eeae7dd84269104b3d9bd779fc2ba779515b80214d
+  - 41d86abee73507d75732b9610f43fa92a7335ea4176299784842bdc1fe0c357a
+  - 42697f3ef8f4629b645fd2e644641324a1c11835498e638f757f278afbce5db1
+  - 4378b582d19ccc55b023eb82eda271bac4744fa2006cf5e190246e2b4d5d
+  - 7f24b7135789fe799df34594d6805f5112bee6232605ba6de215186ad94
+  - 84cedb968645e243e5adaeb1868696a673b907a6784188071b63d1fa9cd7b5
+  - 87b3d291d3b99bcd4c37a1839dc160d885ecd4e237b3aea1baf0adbb1775cd64
+  - 8ee97a08ad054b80684e76f1329ddd0b1fa273b0699ee86b21379704f7468ca
+  - fadbbab3881aacba577e27bbee1fbe4b9a50e19f5a87f8d49b636054fa1788fc

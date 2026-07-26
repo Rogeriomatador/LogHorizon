@@ -1,0 +1,37 @@
+LOG HORIZON - GARDEN VISÍVEL NO BEDROCK
+
+ARQUIVO 1: garden_fruits.yml
+Destino:
+plugins/Geyser-Spigot/extensions/geyserdisplayentity/Mappings/garden_fruits.yml
+
+Este arquivo faz a maçã normal do Minecraft deixar de ser escondida pelo modo
+"hide-unmapped-vanilla-displays: true" usado na correção das portas.
+
+ARQUIVO 2: garden-skin-hashes.txt
+Destino das linhas:
+plugins/Geyser-Spigot/custom-skulls.yml
+
+Abra custom-skulls.yml e localize:
+skin-hashes:
+
+Cole abaixo dela as linhas do arquivo garden-skin-hashes.txt.
+Não crie uma segunda seção skin-hashes e não apague cabeças que já existam.
+
+CONFIG DO GEYSER:
+No plugins/Geyser-Spigot/config.yml, confirme que a opção atual equivalente a
+gameplay.enable-custom-content está ativada (true).
+
+IMPORTANTE:
+- Mantenha GeyserDisplayEntity-1.0.11-LH-DOORS-FIX3.jar.
+- Não substitua o mapeamento das portas. garden_fruits.yml é um arquivo separado.
+- Desligue e ligue o servidor completamente; não use /reload.
+- O Geyser gerará novamente o pacote de cabeças na inicialização.
+- No celular, feche o Minecraft, apague os dados em cache do pacote Log Horizon/Geyser,
+  entre novamente e aceite o pacote atualizado.
+
+TESTE:
+1. Observe uma macieira: a maçã precisa aparecer presa à árvore.
+2. Observe uma videira: a uva precisa usar a textura correta, não a cabeça do Steve.
+3. Colha as duas para confirmar que GardenPlus, XP e qualidade continuam normais.
+
+TEXTURAS ENCONTRADAS AUTOMATICAMENTE: 9
