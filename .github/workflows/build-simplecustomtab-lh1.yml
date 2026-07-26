@@ -1,0 +1,93 @@
+name: Build SimpleCustomTab LH1
+
+on:
+  pull_request:
+    paths:
+      - 'simplecustomtab-lh1/**'
+      - '.github/workflows/build-simplecustomtab-lh1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Log Horizon
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Obter fonte oficial 1.1.1
+        run: |
+          git clone https://github.com/Simplexity-Development/SimpleCustomTab.git upstream
+          cd upstream
+          git checkout 56469bd1da7bf42327beaf2d8429442a2a2c4ab7
+
+      - name: Aplicar correção Log Horizon
+        run: |
+          python3 simplecustomtab-lh1/patch.py upstream
+          grep -q 'sendPlayerListHeaderAndFooter' upstream/src/main/java/simplexity/simplecustomtab/util/UpdateTabList.java
+          grep -q 'ParseUtils.papiTag(player)' upstream/src/main/java/simplexity/simplecustomtab/util/UpdateTabList.java
+          grep -q 'Placeholder.unparsed("online"' upstream/src/main/java/simplexity/simplecustomtab/util/ParseUtils.java
+          grep -q 'Placeholder.unparsed("maxplayers"' upstream/src/main/java/simplexity/simplecustomtab/util/ParseUtils.java
+          grep -q 'Placeholder.unparsed("ping"' upstream/src/main/java/simplexity/simplecustomtab/util/ParseUtils.java
+
+      - name: Compilar plugin
+        run: |
+          cd upstream
+          mvn -B -DskipTests package
+
+      - name: Validar JAR e configuração
+        run: |
+          JAR="$(find upstream/target -maxdepth 1 -type f -name 'SimpleCustomTab-1.1.1-LH1.jar' -print -quit)"
+          test -n "$JAR"
+          unzip -t "$JAR"
+          unzip -p "$JAR" plugin.yml | grep -q "version: '1.1.1-LH1'"
+          unzip -p "$JAR" config.yml | grep -q '<papi:auraskills_power>'
+          unzip -p "$JAR" config.yml | grep -q '<papi:auraskills_farming>'
+          grep -q '<displayname>' simplecustomtab-lh1/config.yml
+          grep -q '<online>/<maxplayers>' simplecustomtab-lh1/config.yml
+
+      - name: Gerar pacote direto
+        run: |
+          mkdir -p dist
+          JAR="$(find upstream/target -maxdepth 1 -type f -name 'SimpleCustomTab-1.1.1-LH1.jar' -print -quit)"
+          cp "$JAR" dist/SimpleCustomTab-1.1.1-LH1.jar
+          cp simplecustomtab-lh1/config.yml dist/config.yml
+          cp simplecustomtab-lh1/INSTALACAO.txt dist/INSTALACAO.txt
+          cp simplecustomtab-lh1/PREVIA.txt dist/PREVIA.txt
+          cd dist
+          sha256sum SimpleCustomTab-1.1.1-LH1.jar config.yml INSTALACAO.txt PREVIA.txt > SHA256.txt
+          zip -9 LogHorizon-SimpleCustomTab-1.1.1-LH1.zip \
+            SimpleCustomTab-1.1.1-LH1.jar config.yml INSTALACAO.txt PREVIA.txt SHA256.txt
+          unzip -t LogHorizon-SimpleCustomTab-1.1.1-LH1.zip
+          python3 - <<'PY'
+          import zipfile
+          package = 'LogHorizon-SimpleCustomTab-1.1.1-LH1.zip'
+          expected = {
+              'SimpleCustomTab-1.1.1-LH1.jar',
+              'config.yml',
+              'INSTALACAO.txt',
+              'PREVIA.txt',
+              'SHA256.txt',
+          }
+          with zipfile.ZipFile(package) as archive:
+              names = set(archive.namelist())
+              assert names == expected, names
+              assert not any(name.lower().endswith(('.zip', '.rar', '.7z', '.tar', '.gz')) for name in names)
+          print('Pacote final validado:', sorted(names))
+          PY
+
+      - name: Enviar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizon-SimpleCustomTab-1.1.1-LH1
+          path: dist/LogHorizon-SimpleCustomTab-1.1.1-LH1.zip
+          if-no-files-found: error
