@@ -1,0 +1,31 @@
+# Log Horizon - Corpses 1.3.1
+# Mantém inventário e experiência dentro do cadáver até a interação.
+
+name: "<red>Corpo de <white>%p"
+label: "<gray>Clique para recuperar seus itens"
+
+nameAlwaysVisible: true
+ignoreEmptyInventories: true
+
+pose: "swimming"
+
+# Protege o cadáver contra destruição e movimentação acidentais.
+invulnerable: true
+immovable: true
+health: 20
+onlyAcceptEntityDamage: false
+
+gravity: true
+keepVelocity: false
+floatOnLiquids: true
+
+# "pop" guarda os itens/XP no cadáver e os libera ao clicar nele.
+itemTreatment: "pop"
+xpTreatment: "pop"
+
+# Valor menor que 1 impede o desaparecimento automático.
+lifespan: -1
+
+skin: ""
+armAnimation: true
+scaleAttribute: true
