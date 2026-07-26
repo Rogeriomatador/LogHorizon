@@ -1,0 +1,43 @@
+enabled: true
+
+# O complemento transforma temporariamente a fruta em um material já aceito
+# pelo RealisticVillagers. O item já foi entregue e consumido nesse momento.
+compatibility:
+  bridge-material: APPLE
+  require-native-reputation-gain: true
+  delay-ticks: 1
+
+reputation:
+  normal-fruit: 2
+  quality-fruit: 4
+  perfect-fruit: 7
+  farmer-seed: 3
+
+bonuses:
+  child:
+    enabled: true
+    amount: 1
+    species:
+      - apple
+      - strawberry
+  partner:
+    enabled: true
+    amount: 1
+    species:
+      - cherry
+      - peach
+
+recognition:
+  require-custom-display-name: true
+  require-garden-pdc: false
+  read-lore: true
+  read-string-pdc-values: true
+
+messages:
+  enabled: true
+  extra-reputation: "&aA qualidade do presente impressionou o aldeão! &e+%amount% reputação extra."
+  farmer-seed: "&aO agricultor gostou da semente! &e+%amount% reputação extra."
+  child-bonus: "&aA criança adorou a fruta! &e+%amount% reputação extra."
+  partner-bonus: "&dSeu parceiro gostou especialmente da fruta! &e+%amount% reputação extra."
+
+debug: false
