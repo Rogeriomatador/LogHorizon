@@ -7,22 +7,25 @@ on:
       - '.github/workflows/build-garden-bedrock.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout da branch temporária
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: Clonar fontes oficiais
         run: |
-          git clone --depth 1 https://github.com/BreweryTeam/Garden.git /tmp/Garden
-          git clone --depth 1 https://github.com/GeyserExtensionists/GeyserDisplayEntity.git /tmp/GeyserDisplayEntity
+          git clone --quiet --depth 1 https://github.com/BreweryTeam/Garden.git /tmp/Garden
+          git clone --quiet --depth 1 https://github.com/GeyserExtensionists/GeyserDisplayEntity.git /tmp/GeyserDisplayEntity
 
       - name: Instalar analisador YAML
-        run: python -m pip install --disable-pip-version-check pyyaml
+        run: python -m pip install --quiet --disable-pip-version-check pyyaml
 
       - name: Gerar arquivos do Garden para Bedrock
         shell: bash
@@ -31,7 +34,6 @@ jobs:
           from __future__ import annotations
 
           import base64
-          import json
           import re
           from pathlib import Path
           from typing import Any
@@ -39,7 +41,6 @@ jobs:
           import yaml
 
           garden = Path('/tmp/Garden')
-          gde = Path('/tmp/GeyserDisplayEntity')
           out = Path('garden-bedrock-output')
           out.mkdir(parents=True, exist_ok=True)
 
@@ -85,13 +86,13 @@ jobs:
                   for h in hash_re.findall(decoded):
                       hashes.add(h.lower())
 
-          def walk(node: Any, path: list[str], species_name: str, source: Path) -> None:
+          def walk(node: Any, path: list[str], species_name: str) -> None:
               if isinstance(node, dict):
                   for k, v in node.items():
-                      walk(v, path + [str(k)], species_name, source)
+                      walk(v, path + [str(k)], species_name)
               elif isinstance(node, list):
                   for i, v in enumerate(node):
-                      walk(v, path + [str(i)], species_name, source)
+                      walk(v, path + [str(i)], species_name)
               elif isinstance(node, str):
                   val = node.strip()
                   keypath = '.'.join(path).lower()
@@ -123,9 +124,8 @@ jobs:
                       except Exception:
                           data = None
                       if data is not None:
-                          walk(data, [], s, p)
+                          walk(data, [], s)
 
-          # Varredura adicional limitada a arquivos com PLAYER_HEAD ou URL de textura.
           for p in all_text_files:
               text = p.read_text(encoding='utf-8', errors='ignore')
               if 'PLAYER_HEAD' not in text and 'textures.minecraft.net/texture/' not in text:
@@ -139,7 +139,7 @@ jobs:
                   except Exception:
                       data = None
                   if data is not None:
-                      walk(data, [], 'global', p)
+                      walk(data, [], 'global')
 
           hashes = {h for h in hashes if 32 <= len(h) <= 128}
           sorted_hashes = sorted(hashes)
@@ -161,7 +161,6 @@ jobs:
           (out / 'INSTALACAO.txt').write_text(install, encoding='utf-8')
 
           report = []
-          report.append(f'Garden commit: ')
           report.append(f'Arquivos de texto analisados: {len(all_text_files)}')
           report.append(f'Hashes encontrados: {len(sorted_hashes)}')
           report.extend(f'HASH {h}' for h in sorted_hashes)
@@ -174,23 +173,16 @@ jobs:
           report.extend(diagnostics)
           (out / 'DIAGNOSTICO.txt').write_text('\n'.join(report) + '\n', encoding='utf-8')
 
-          # Validações para impedir a entrega de um pacote vazio ou incompleto.
           assert 'minecraft:apple' in mapping
           assert len(sorted_hashes) >= 8, f'Poucas texturas encontradas: {len(sorted_hashes)}'
           assert (out / 'garden_fruits.yml').stat().st_size > 80
           assert (out / 'garden-skin-hashes.txt').stat().st_size > 100
 
-          print('=== RESUMO DA DESCOBERTA ===')
-          print(f'Arquivos analisados: {len(all_text_files)}')
           print(f'Hashes de frutas encontrados: {len(sorted_hashes)}')
           for h in sorted_hashes:
               print('HASH', h)
-          print('=== MATERIAIS CANDIDATOS ===')
           for s, path, material in sorted(set(material_hits)):
-              print(f'{s}: {path} = {material}')
-          print('=== ARQUIVOS GERADOS ===')
-          for p in sorted(out.iterdir()):
-              print(p.name, p.stat().st_size)
+              print(f'MATERIAL {s}: {path} = {material}')
           PY
 
       - name: Validar YAML gerado
@@ -209,6 +201,19 @@ jobs:
         run: |
           cd garden-bedrock-output
           sha256sum garden_fruits.yml custom-skulls-GARDEN-ADICIONAR.yml garden-skin-hashes.txt INSTALACAO.txt DIAGNOSTICO.txt > SHA256.txt
+
+      - name: Publicar arquivos para validação
+        run: |
+          rm -rf generated/garden-bedrock
+          mkdir -p generated/garden-bedrock
+          cp garden-bedrock-output/* generated/garden-bedrock/
+          git config user.name "Log Horizon Build"
+          git config user.email "actions@users.noreply.github.com"
+          git add generated/garden-bedrock
+          if ! git diff --cached --quiet; then
+            git commit -m "Gerar pacote Garden Bedrock validado"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
 
       - name: Enviar pacote
         uses: actions/upload-artifact@v4
