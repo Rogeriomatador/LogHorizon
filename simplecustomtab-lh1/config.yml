@@ -1,0 +1,54 @@
+# Log Horizon - SimpleCustomTab 1.1.1-LH1
+# Visual definitivo, compacto e personalizado por jogador.
+
+header:
+  - ""
+  - "<gradient:#43D9FF:#7C5CFF><bold>◆ LOG HORIZON ◆</bold></gradient>"
+  - "<gray>RPG Survival <dark_gray>•</dark_gray> Java + Bedrock</gray>"
+  - "<gradient:#244A78:#43D9FF>━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>"
+  - "<white>Bem-vindo, <aqua><bold><displayname></bold></aqua></white>"
+  - "<gray><online>/<maxplayers> online</gray> <dark_gray>•</dark_gray> <aqua><ping>ms</aqua>"
+
+footer:
+  - ""
+  - "<gradient:#7C5CFF:#43D9FF>━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>"
+  - "<gold><bold>⚔ PODER</bold></gold> <white><papi:auraskills_power></white> <dark_gray>•</dark_gray> <green><bold>✦ AGRICULTURA</bold></green> <white><papi:auraskills_farming></white>"
+  - "<gray>Use <aqua>/skills</aqua> para evoluir e desbloquear habilidades</gray>"
+  - "<gradient:#43D9FF:#7C5CFF>Seu progresso escreve o próximo horizonte.</gradient>"
+  - ""
+
+# Linha de cada jogador: cargo, nome, poder e ping.
+player: "<papi:luckperms_prefix><white><displayname></white> <dark_gray>│</dark_gray> <gold>⚔ <papi:auraskills_power></gold> <dark_gray>│</dark_gray> <aqua><ping>ms</aqua>"
+
+# Atualização a cada 2 segundos: responsiva e leve.
+update-ticks: 40
+
+# Desativado para evitar piscadas e inconsistências no Bedrock.
+animated:
+  enabled: false
+  delay-ticks: 10
+  header: []
+  footer: []
+
+# Preparado para ordenar cargos no futuro, sem alterar a ordem atual.
+sort-users:
+  enabled: false
+  sort-order:
+    5: "tablist.order.admin"
+    4: "tablist.order.mod"
+    3: "tablist.order.vip"
+    2: "tablist.order.veteran"
+    1: "tablist.order.member"
+
+# O prefixo do LuckPerms já é usado diretamente na linha player.
+permission-formatting:
+  enabled: false
+  formats:
+    admin:
+      permission: "tablist.formatting.admin"
+      format: "<red><bold>ADMIN</bold></red> <displayname>"
+      priority: 5
+    mod:
+      permission: "tablist.formatting.mod"
+      format: "<gold><bold>MOD</bold></gold> <displayname>"
+      priority: 4
