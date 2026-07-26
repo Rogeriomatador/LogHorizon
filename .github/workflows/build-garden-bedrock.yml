@@ -1,0 +1,219 @@
+name: Build Garden Bedrock Support
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/build-garden-bedrock.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clonar fontes oficiais
+        run: |
+          git clone --depth 1 https://github.com/BreweryTeam/Garden.git /tmp/Garden
+          git clone --depth 1 https://github.com/GeyserExtensionists/GeyserDisplayEntity.git /tmp/GeyserDisplayEntity
+
+      - name: Instalar analisador YAML
+        run: python -m pip install --disable-pip-version-check pyyaml
+
+      - name: Gerar arquivos do Garden para Bedrock
+        shell: bash
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+
+          import base64
+          import json
+          import re
+          from pathlib import Path
+          from typing import Any
+
+          import yaml
+
+          garden = Path('/tmp/Garden')
+          gde = Path('/tmp/GeyserDisplayEntity')
+          out = Path('garden-bedrock-output')
+          out.mkdir(parents=True, exist_ok=True)
+
+          species = [
+              'apple', 'blueberry', 'cherry', 'cranberry', 'grape',
+              'lemon', 'lime', 'orange', 'peach', 'raspberry', 'strawberry'
+          ]
+
+          text_exts = {'.yml', '.yaml', '.json', '.properties', '.txt'}
+          all_text_files: list[Path] = []
+          for p in garden.rglob('*'):
+              if p.is_file() and p.suffix.lower() in text_exts:
+                  all_text_files.append(p)
+
+          candidates: dict[str, list[Path]] = {s: [] for s in species}
+          for p in all_text_files:
+              rel = str(p.relative_to(garden)).lower()
+              try:
+                  text = p.read_text(encoding='utf-8', errors='ignore')
+              except Exception:
+                  continue
+              low = text.lower()
+              for s in species:
+                  if s in rel or re.search(rf'(?<![a-z]){re.escape(s)}(?![a-z])', low):
+                      candidates[s].append(p)
+
+          hash_re = re.compile(r'textures\.minecraft\.net/texture/([0-9a-fA-F]{32,128})')
+          hex64_re = re.compile(r'^[0-9a-fA-F]{64}$')
+          base64_re = re.compile(r'(?<![A-Za-z0-9+/])([A-Za-z0-9+/]{80,}={0,2})(?![A-Za-z0-9+/])')
+          material_re = re.compile(r'^[A-Z][A-Z0-9_]{2,}$')
+
+          hashes: set[str] = set()
+          material_hits: list[tuple[str, str, str]] = []
+          diagnostics: list[str] = []
+
+          def decode_b64_candidates(text: str) -> None:
+              for token in base64_re.findall(text):
+                  try:
+                      padded = token + '=' * ((4 - len(token) % 4) % 4)
+                      decoded = base64.b64decode(padded, validate=False).decode('utf-8', errors='ignore')
+                  except Exception:
+                      continue
+                  for h in hash_re.findall(decoded):
+                      hashes.add(h.lower())
+
+          def walk(node: Any, path: list[str], species_name: str, source: Path) -> None:
+              if isinstance(node, dict):
+                  for k, v in node.items():
+                      walk(v, path + [str(k)], species_name, source)
+              elif isinstance(node, list):
+                  for i, v in enumerate(node):
+                      walk(v, path + [str(i)], species_name, source)
+              elif isinstance(node, str):
+                  val = node.strip()
+                  keypath = '.'.join(path).lower()
+                  for h in hash_re.findall(val):
+                      hashes.add(h.lower())
+                  if hex64_re.fullmatch(val) and any(k in keypath for k in ('texture', 'skin', 'head', 'profile')):
+                      hashes.add(val.lower())
+                  if material_re.fullmatch(val) and any(k in keypath for k in ('fruit', 'drop', 'harvest', 'item', 'material', 'head')):
+                      material_hits.append((species_name, '.'.join(path), val))
+                  decode_b64_candidates(val)
+
+          seen_files: set[Path] = set()
+          for s in species:
+              diagnostics.append(f'=== {s.upper()} ===')
+              unique = sorted(set(candidates[s]), key=lambda p: str(p))
+              for p in unique:
+                  rel = p.relative_to(garden)
+                  diagnostics.append(str(rel))
+                  if p in seen_files:
+                      continue
+                  seen_files.add(p)
+                  text = p.read_text(encoding='utf-8', errors='ignore')
+                  for h in hash_re.findall(text):
+                      hashes.add(h.lower())
+                  decode_b64_candidates(text)
+                  if p.suffix.lower() in {'.yml', '.yaml', '.json'}:
+                      try:
+                          data = yaml.safe_load(text)
+                      except Exception:
+                          data = None
+                      if data is not None:
+                          walk(data, [], s, p)
+
+          # Varredura adicional limitada a arquivos com PLAYER_HEAD ou URL de textura.
+          for p in all_text_files:
+              text = p.read_text(encoding='utf-8', errors='ignore')
+              if 'PLAYER_HEAD' not in text and 'textures.minecraft.net/texture/' not in text:
+                  continue
+              for h in hash_re.findall(text):
+                  hashes.add(h.lower())
+              decode_b64_candidates(text)
+              if p.suffix.lower() in {'.yml', '.yaml', '.json'}:
+                  try:
+                      data = yaml.safe_load(text)
+                  except Exception:
+                      data = None
+                  if data is not None:
+                      walk(data, [], 'global', p)
+
+          hashes = {h for h in hashes if 32 <= len(h) <= 128}
+          sorted_hashes = sorted(hashes)
+
+          mapping = '''# Log Horizon - Garden no Bedrock\n# Coloque em:\n# plugins/Geyser-Spigot/extensions/geyserdisplayentity/Mappings/garden_fruits.yml\n\nmappings:\n  garden_apple:\n    type: minecraft:apple\n    model-data: -1\n    item-identifier: none\n'''
+          (out / 'garden_fruits.yml').write_text(mapping, encoding='utf-8')
+
+          skull_lines = [
+              '# Log Horizon - texturas das frutas do Garden',
+              '# NÃO substitua seu custom-skulls.yml se ele já tiver outras cabeças.',
+              '# Copie somente as linhas com hífen para dentro da seção skin-hashes existente.',
+              'skin-hashes:'
+          ]
+          skull_lines.extend(f'  - {h}' for h in sorted_hashes)
+          (out / 'custom-skulls-GARDEN-ADICIONAR.yml').write_text('\n'.join(skull_lines) + '\n', encoding='utf-8')
+          (out / 'garden-skin-hashes.txt').write_text('\n'.join(f'  - {h}' for h in sorted_hashes) + '\n', encoding='utf-8')
+
+          install = f'''LOG HORIZON - GARDEN VISÍVEL NO BEDROCK\n\nARQUIVO 1: garden_fruits.yml\nDestino:\nplugins/Geyser-Spigot/extensions/geyserdisplayentity/Mappings/garden_fruits.yml\n\nEste arquivo faz a maçã normal do Minecraft deixar de ser escondida pelo modo\n"hide-unmapped-vanilla-displays: true" usado na correção das portas.\n\nARQUIVO 2: garden-skin-hashes.txt\nDestino das linhas:\nplugins/Geyser-Spigot/custom-skulls.yml\n\nAbra custom-skulls.yml e localize:\nskin-hashes:\n\nCole abaixo dela as linhas do arquivo garden-skin-hashes.txt.\nNão crie uma segunda seção skin-hashes e não apague cabeças que já existam.\n\nCONFIG DO GEYSER:\nNo plugins/Geyser-Spigot/config.yml, confirme que a opção atual equivalente a\ngameplay.enable-custom-content está ativada (true).\n\nIMPORTANTE:\n- Mantenha GeyserDisplayEntity-1.0.11-LH-DOORS-FIX3.jar.\n- Não substitua o mapeamento das portas. garden_fruits.yml é um arquivo separado.\n- Desligue e ligue o servidor completamente; não use /reload.\n- O Geyser gerará novamente o pacote de cabeças na inicialização.\n- No celular, feche o Minecraft, apague os dados em cache do pacote Log Horizon/Geyser,\n  entre novamente e aceite o pacote atualizado.\n\nTESTE:\n1. Observe uma macieira: a maçã precisa aparecer presa à árvore.\n2. Observe uma videira: a uva precisa usar a textura correta, não a cabeça do Steve.\n3. Colha as duas para confirmar que GardenPlus, XP e qualidade continuam normais.\n\nTEXTURAS ENCONTRADAS AUTOMATICAMENTE: {len(sorted_hashes)}\n'''
+          (out / 'INSTALACAO.txt').write_text(install, encoding='utf-8')
+
+          report = []
+          report.append(f'Garden commit: ')
+          report.append(f'Arquivos de texto analisados: {len(all_text_files)}')
+          report.append(f'Hashes encontrados: {len(sorted_hashes)}')
+          report.extend(f'HASH {h}' for h in sorted_hashes)
+          report.append('')
+          report.append('Materiais candidatos:')
+          for s, path, material in sorted(set(material_hits)):
+              report.append(f'{s}: {path} = {material}')
+          report.append('')
+          report.append('Arquivos candidatos por espécie:')
+          report.extend(diagnostics)
+          (out / 'DIAGNOSTICO.txt').write_text('\n'.join(report) + '\n', encoding='utf-8')
+
+          # Validações para impedir a entrega de um pacote vazio ou incompleto.
+          assert 'minecraft:apple' in mapping
+          assert len(sorted_hashes) >= 8, f'Poucas texturas encontradas: {len(sorted_hashes)}'
+          assert (out / 'garden_fruits.yml').stat().st_size > 80
+          assert (out / 'garden-skin-hashes.txt').stat().st_size > 100
+
+          print('=== RESUMO DA DESCOBERTA ===')
+          print(f'Arquivos analisados: {len(all_text_files)}')
+          print(f'Hashes de frutas encontrados: {len(sorted_hashes)}')
+          for h in sorted_hashes:
+              print('HASH', h)
+          print('=== MATERIAIS CANDIDATOS ===')
+          for s, path, material in sorted(set(material_hits)):
+              print(f'{s}: {path} = {material}')
+          print('=== ARQUIVOS GERADOS ===')
+          for p in sorted(out.iterdir()):
+              print(p.name, p.stat().st_size)
+          PY
+
+      - name: Validar YAML gerado
+        run: |
+          python - <<'PY'
+          import yaml
+          from pathlib import Path
+          for name in ['garden_fruits.yml', 'custom-skulls-GARDEN-ADICIONAR.yml']:
+              path = Path('garden-bedrock-output') / name
+              with path.open(encoding='utf-8') as f:
+                  yaml.safe_load(f)
+              print('YAML válido:', name)
+          PY
+
+      - name: Gerar checksums
+        run: |
+          cd garden-bedrock-output
+          sha256sum garden_fruits.yml custom-skulls-GARDEN-ADICIONAR.yml garden-skin-hashes.txt INSTALACAO.txt DIAGNOSTICO.txt > SHA256.txt
+
+      - name: Enviar pacote
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizon-Garden-Bedrock-FIX1
+          path: garden-bedrock-output/
+          if-no-files-found: error
+          retention-days: 7
