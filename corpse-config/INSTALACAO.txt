@@ -1,0 +1,17 @@
+LOG HORIZON - CORPSES 1.3.1
+
+INSTALAÇÃO
+1. Desligue completamente o servidor.
+2. Mantenha plugins/Corpses-1.3.1.jar.
+3. Substitua plugins/Corpse/config.yml pelo config.yml deste pacote.
+4. Ligue o servidor normalmente. Não use /reload.
+
+COMPORTAMENTO
+- Ao morrer, os itens e a experiência ficam armazenados no cadáver.
+- Ao clicar com o botão direito no cadáver, os itens e o XP são liberados no local.
+- O cadáver não desaparece automaticamente.
+- O cadáver fica invulnerável e imóvel para evitar perda acidental.
+
+LIMITAÇÃO DA VERSÃO ORIGINAL
+- O Corpses 1.3.1 solta os itens ao redor do corpo; ele não os recoloca automaticamente nos mesmos slots.
+- A versão original também não restringe o cadáver ao dono.
