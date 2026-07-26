@@ -1,0 +1,33 @@
+LOG HORIZON - GARDENPLUS 1.0.0
+
+REQUISITOS
+- Paper 26.2 / Java 21
+- Garden 2.0.1
+- AuraSkills 2.3.12
+
+INSTALACAO
+1. Desligue completamente o servidor.
+2. Coloque LogHorizonGardenPlus.jar diretamente em plugins/.
+3. Ligue o servidor uma vez. A pasta plugins/LogHorizonGardenPlus/ será criada automaticamente.
+4. Desligue o servidor.
+5. Coloque config.yml em plugins/LogHorizonGardenPlus/config.yml e confirme a substituição.
+6. Ligue o servidor novamente.
+
+NAO APAGUE
+- plugins/Garden/garden.db
+- plugins/LogHorizonGardenPlus/plants.yml
+
+O plants.yml é criado automaticamente e guarda quais plantas nasceram férteis ou antigas.
+
+COMANDO
+/lhgarden reload
+
+FUNCOES
+- raridade de sementes por espécie;
+- quantidades de colheita diferentes;
+- fruta normal, de qualidade ou perfeita;
+- plantas férteis e antigas;
+- XP de Agricultura no AuraSkills;
+- chance pequena de +1 fruta baseada no nível de Agricultura;
+- proteção contra XP duplicado;
+- nenhum efeito de poção, bebida ou receita culinária.
