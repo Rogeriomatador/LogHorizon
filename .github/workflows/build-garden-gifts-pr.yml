@@ -1,0 +1,52 @@
+name: Validate Garden Gifts PR
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'tools/loghorizon-garden-gifts/**'
+      - '.github/workflows/build-garden-gifts-pr.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Corrigir importação compatível com Bukkit
+        run: |
+          sed -i 's/import org.bukkit.event.EventExecutor;/import org.bukkit.plugin.EventExecutor;/' tools/loghorizon-garden-gifts/src/main/java/br/com/loghorizon/gardengifts/LogHorizonGardenGifts.java
+
+      - name: Compilar
+        working-directory: tools/loghorizon-garden-gifts
+        run: mvn --batch-mode --no-transfer-progress clean package
+
+      - name: Preparar pacote
+        working-directory: tools/loghorizon-garden-gifts
+        run: |
+          mkdir -p dist
+          cp target/LogHorizonGardenGifts.jar dist/LogHorizonGardenGifts.jar
+          cp src/main/resources/config.yml dist/config.yml
+          cp INSTALACAO.txt dist/INSTALACAO.txt
+          cd dist
+          sha256sum LogHorizonGardenGifts.jar > SHA256.txt
+
+      - name: Enviar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizonGardenGifts-1.0.0
+          path: tools/loghorizon-garden-gifts/dist/*
+          if-no-files-found: error
+          retention-days: 7
