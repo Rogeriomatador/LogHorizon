@@ -1,9 +1,13 @@
-# Log Horizon - Garden no Bedrock
-# Coloque em:
+# Log Horizon - Garden 2.0.1 no Bedrock
+# Destino:
 # plugins/Geyser-Spigot/extensions/geyserdisplayentity/Mappings/garden_fruits.yml
 
 mappings:
   garden_apple:
     type: minecraft:apple
+    model-data: -1
+    item-identifier: none
+  garden_cranberry:
+    type: minecraft:sweet_berries
     model-data: -1
     item-identifier: none

@@ -1,37 +1,42 @@
-LOG HORIZON - GARDEN VISÍVEL NO BEDROCK
+LOG HORIZON - GARDEN 2.0.1 VISÍVEL NO BEDROCK
+
+VALIDAÇÃO AUTOMÁTICA:
+- Frutas vanilla: apple=minecraft:apple, cranberry=minecraft:sweet_berries
+- Cabeças personalizadas registradas: 9
 
 ARQUIVO 1: garden_fruits.yml
 Destino:
 plugins/Geyser-Spigot/extensions/geyserdisplayentity/Mappings/garden_fruits.yml
 
-Este arquivo faz a maçã normal do Minecraft deixar de ser escondida pelo modo
-"hide-unmapped-vanilla-displays: true" usado na correção das portas.
+Não substitua animated_doors.yml. Os dois arquivos devem permanecer na pasta Mappings.
+Este mapeamento permite mostrar as frutas vanilla mesmo com:
+hide-unmapped-vanilla-displays: true
 
 ARQUIVO 2: garden-skin-hashes.txt
-Destino das linhas:
+As linhas deste arquivo devem ser adicionadas em:
 plugins/Geyser-Spigot/custom-skulls.yml
 
-Abra custom-skulls.yml e localize:
+Localize a seção já existente:
 skin-hashes:
 
-Cole abaixo dela as linhas do arquivo garden-skin-hashes.txt.
-Não crie uma segunda seção skin-hashes e não apague cabeças que já existam.
+e cole abaixo dela as linhas iniciadas por hífen. Não crie uma segunda seção
+skin-hashes e não apague hashes que já estejam no arquivo.
 
-CONFIG DO GEYSER:
-No plugins/Geyser-Spigot/config.yml, confirme que a opção atual equivalente a
-gameplay.enable-custom-content está ativada (true).
+CONFIGURAÇÃO DO GEYSER:
+Confirme em plugins/Geyser-Spigot/config.yml que o conteúdo personalizado está
+ativado, na opção atual equivalente a gameplay.enable-custom-content: true.
 
-IMPORTANTE:
-- Mantenha GeyserDisplayEntity-1.0.11-LH-DOORS-FIX3.jar.
-- Não substitua o mapeamento das portas. garden_fruits.yml é um arquivo separado.
-- Desligue e ligue o servidor completamente; não use /reload.
-- O Geyser gerará novamente o pacote de cabeças na inicialização.
-- No celular, feche o Minecraft, apague os dados em cache do pacote Log Horizon/Geyser,
-  entre novamente e aceite o pacote atualizado.
+PROCEDIMENTO:
+1. Desligue completamente o servidor.
+2. Instale garden_fruits.yml no destino indicado.
+3. Mescle as linhas de garden-skin-hashes.txt em custom-skulls.yml.
+4. Mantenha GeyserDisplayEntity-1.0.11-LH-DOORS-FIX3.jar sem alterações.
+5. Ligue o servidor e aguarde o Geyser gerar/atualizar o pacote de cabeças.
+6. Feche o Minecraft Bedrock no celular.
+7. Apague o pacote Log Horizon/Geyser em Configurações > Armazenamento > Dados em cache.
+8. Entre novamente e aceite o pacote atualizado.
 
 TESTE:
-1. Observe uma macieira: a maçã precisa aparecer presa à árvore.
-2. Observe uma videira: a uva precisa usar a textura correta, não a cabeça do Steve.
-3. Colha as duas para confirmar que GardenPlus, XP e qualidade continuam normais.
-
-TEXTURAS ENCONTRADAS AUTOMATICAMENTE: 9
+- As frutas vanilla devem aparecer presas às plantas.
+- A uva e as demais frutas em cabeças devem usar suas texturas, não Steve.
+- A colheita, o XP, as qualidades e as plantas férteis continuam no GardenPlus.
