@@ -1,4 +1,4 @@
-name: Inspect RealisticVillagers 3.3.6.10
+name: Build GardenPlus RV 1.1.0 (Queryable)
 
 on:
   push:
@@ -6,136 +6,18 @@ on:
       - inspect-rv-33610-20260726
     paths:
       - '.github/workflows/inspect-rv-33610.yml'
+      - '.github/workflows/build-gardenplus-rv.yml'
   pull_request:
     branches:
       - main
     paths:
       - '.github/workflows/inspect-rv-33610.yml'
+      - '.github/workflows/build-gardenplus-rv.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  inspect:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-
-      - name: Download exact RealisticVillagers 3.3.6.10
-        shell: python
-        run: |
-          import json
-          import pathlib
-          import urllib.request
-
-          api = 'https://api.modrinth.com/v2/version/qvzNMiDr'
-          request = urllib.request.Request(api, headers={'User-Agent': 'LogHorizonGardenPlus/1.1.0'})
-          with urllib.request.urlopen(request) as response:
-              version = json.load(response)
-
-          files = version.get('files', [])
-          selected = next((f for f in files if f.get('primary')), files[0] if files else None)
-          if selected is None:
-              raise SystemExit('No downloadable file found')
-
-          target = pathlib.Path('rv.jar')
-          urllib.request.urlretrieve(selected['url'], target)
-          print('VERSION_NUMBER=' + version.get('version_number', 'unknown'))
-          print('FILE_NAME=' + selected.get('filename', 'unknown'))
-          print('SIZE=' + str(target.stat().st_size))
-
-      - name: List relevant classes and resources
-        run: |
-          echo '=== PLUGIN METADATA ==='
-          unzip -p rv.jar plugin.yml || true
-          echo
-          echo '=== RELEVANT JAR ENTRIES ==='
-          jar tf rv.jar | grep -Ei 'gift|reputation|gossip|IVillagerNPC|INMSConverter|RealisticVillagers.class|ExpectingManager|Pickup|Item' | sort | tee relevant-entries.txt
-
-      - name: Inspect public and private signatures
-        run: |
-          mkdir -p inspection
-          classes=(
-            me.matsubara.realisticvillagers.RealisticVillagers
-            me.matsubara.realisticvillagers.entity.IVillagerNPC
-            me.matsubara.realisticvillagers.nms.INMSConverter
-            me.matsubara.realisticvillagers.manager.gift.GiftManager
-            me.matsubara.realisticvillagers.manager.gift.GiftCategory
-            me.matsubara.realisticvillagers.manager.gift.Gift
-            me.matsubara.realisticvillagers.manager.ExpectingManager
-          )
-          for cls in "${classes[@]}"; do
-            echo "===== $cls =====" | tee -a inspection/javap.txt
-            javap -classpath rv.jar -p -c "$cls" 2>&1 | tee -a inspection/javap.txt || true
-          done
-
-      - name: Extract bundled gift configuration
-        run: |
-          mkdir -p inspection/resources
-          for candidate in gifts.yml config.yml messages.yml; do
-            if jar tf rv.jar | grep -qx "$candidate"; then
-              unzip -p rv.jar "$candidate" > "inspection/resources/$candidate"
-            fi
-          done
-          find inspection/resources -maxdepth 1 -type f -print -exec sed -n '1,240p' {} \;
-
-      - name: Download CFR decompiler
-        run: |
-          curl -fsSL -o cfr.jar https://www.benf.org/other/cfr/cfr-0.152.jar
-
-      - name: Decompile exact JAR
-        run: |
-          mkdir -p inspection/decompiled
-          java -jar cfr.jar rv.jar \
-            --outputdir inspection/decompiled \
-            --silent true \
-            --extraclasspath rv.jar
-          find inspection/decompiled -type f | grep -Ei 'GiftManager|GiftCategory|ExpectingManager|IVillagerNPC|INMSConverter|RealisticVillagers.java' | sort > inspection/decompiled-files.txt
-          echo '=== DECOMPILED FILES ==='
-          cat inspection/decompiled-files.txt
-
-      - name: Publish relevant exact sources to temporary branch
-        run: |
-          rm -rf /tmp/rv-inspection
-          mkdir -p /tmp/rv-inspection/source/manager /tmp/rv-inspection/source/entity /tmp/rv-inspection/source/nms /tmp/rv-inspection/resources
-
-          root='inspection/decompiled/me/matsubara/realisticvillagers'
-          cp -R "$root/manager/gift" /tmp/rv-inspection/source/manager/
-          cp "$root/manager/ExpectingManager.java" /tmp/rv-inspection/source/manager/
-          cp "$root/entity/IVillagerNPC.java" /tmp/rv-inspection/source/entity/
-          cp "$root/nms/INMSConverter.java" /tmp/rv-inspection/source/nms/
-          cp "$root/RealisticVillagers.java" /tmp/rv-inspection/source/
-          cp inspection/javap.txt /tmp/rv-inspection/
-          cp relevant-entries.txt /tmp/rv-inspection/
-          cp -R inspection/resources/. /tmp/rv-inspection/resources/ || true
-
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git fetch origin inspect-rv-33610-20260726
-          git checkout -B inspect-rv-33610-20260726 origin/inspect-rv-33610-20260726
-          rm -rf rv-inspection
-          cp -R /tmp/rv-inspection rv-inspection
-          git add rv-inspection
-          if git diff --cached --quiet; then
-            echo 'Inspection files already published.'
-            exit 0
-          fi
-          git commit -m 'Publish exact RealisticVillagers 3.3.6.10 inspection'
-          git push origin HEAD:inspect-rv-33610-20260726
-
-      - name: Upload inspection artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: RealisticVillagers-3.3.6.10-inspection
-          path: |
-            inspection/
-            relevant-entries.txt
-          if-no-files-found: error
+  build:
+    uses: ./.github/workflows/build-gardenplus-rv.yml
