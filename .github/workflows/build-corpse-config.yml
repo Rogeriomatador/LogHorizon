@@ -1,0 +1,51 @@
+name: Build Corpse Config
+
+on:
+  pull_request:
+    paths:
+      - 'corpse-config/**'
+      - '.github/workflows/build-corpse-config.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validar configuração
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path('corpse-config/config.yml').read_text(encoding='utf-8')
+          required = [
+              'itemTreatment: "pop"',
+              'xpTreatment: "pop"',
+              'lifespan: -1',
+              'invulnerable: true',
+              'immovable: true',
+          ]
+          missing = [x for x in required if x not in text]
+          if missing:
+              raise SystemExit(f'Campos ausentes: {missing}')
+          print('Configuração validada com sucesso')
+          PY
+
+      - name: Preparar pacote
+        run: |
+          mkdir -p dist
+          cp corpse-config/config.yml dist/config.yml
+          cp corpse-config/INSTALACAO.txt dist/INSTALACAO.txt
+          cd dist
+          sha256sum config.yml INSTALACAO.txt > SHA256.txt
+          zip -9 LogHorizon-Corpse-1.3.1-CONFIG.zip config.yml INSTALACAO.txt SHA256.txt
+
+      - name: Enviar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizon-Corpse-1.3.1-CONFIG
+          path: dist/LogHorizon-Corpse-1.3.1-CONFIG.zip
+          if-no-files-found: error
