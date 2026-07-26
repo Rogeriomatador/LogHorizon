@@ -1,0 +1,34 @@
+LOG HORIZON - SIMPLECUSTOMTAB 1.1.1-LH1
+
+IMPORTANTE
+Esta versão corrige o SimpleCustomTab para que o cabeçalho e o rodapé sejam montados individualmente para cada jogador. Assim, nome, Poder, Agricultura, ping e quantidade online funcionam corretamente.
+
+INSTALAÇÃO
+1. Desligue completamente o servidor.
+2. Apague ou retire da pasta plugins o arquivo antigo SimpleCustomTab-1.1.1.jar.
+3. Coloque SimpleCustomTab-1.1.1-LH1.jar diretamente na pasta plugins.
+4. Substitua plugins/SimpleCustomTab/config.yml pelo config.yml deste pacote.
+5. Ligue o servidor normalmente. Não use /reload.
+
+NÃO DEIXE OS DOIS JARS JUNTOS
+- SimpleCustomTab-1.1.1.jar: remover.
+- SimpleCustomTab-1.1.1-LH1.jar: manter.
+
+O QUE FOI CORRIGIDO
+- <displayname> agora funciona no cabeçalho e rodapé.
+- Placeholders do AuraSkills agora usam o jogador correto.
+- Cada jogador vê seus próprios Poder, Agricultura e ping.
+- Cabeçalho e rodapé são enviados juntos para reduzir piscadas.
+- Foram adicionados os placeholders internos <online>, <maxplayers>, <ping> e <world>.
+
+DEPENDÊNCIAS
+- PlaceholderAPI deve permanecer instalado.
+- AuraSkills já fornece seus próprios placeholders, sem expansão separada.
+- O prefixo do LuckPerms exige a expansão do LuckPerms no PlaceholderAPI. Se não houver prefixo configurado, a linha começa diretamente pelo nome.
+
+TESTE
+Entre no servidor e abra a TAB. Os números de Poder e Agricultura devem aparecer. Para confirmar pelo console ou jogo, também é possível testar:
+/papi parse me %auraskills_power%
+/papi parse me %auraskills_farming%
+
+O comando /sctreload continua disponível para mudanças pequenas futuras, mas esta instalação exige reinicialização completa.
