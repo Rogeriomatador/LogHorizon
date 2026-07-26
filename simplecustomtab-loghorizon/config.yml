@@ -1,0 +1,57 @@
+# Log Horizon - SimpleCustomTab 1.1.1
+# Compatível com MiniMessage e PlaceholderAPI.
+# O plugin atualiza a TAB a cada 40 ticks (2 segundos), reduzindo trabalho desnecessário.
+
+header:
+  - ""
+  - "<gradient:#67E8F9:#818CF8><bold>LOG HORIZON</bold></gradient>"
+  - "<gray>Servidor RPG - Java e Bedrock</gray>"
+  - "<dark_gray>----------------------------</dark_gray>"
+
+footer:
+  - "<dark_gray>----------------------------</dark_gray>"
+  - "<gray>Poder: <aqua><papi:auraskills_power></aqua> <dark_gray>|</dark_gray> Agricultura: <green><papi:auraskills_farming></green></gray>"
+  - "<gray>Use <white>/skills</white> para acompanhar sua evolução</gray>"
+  - ""
+
+# Prefixo do LuckPerms + nome do jogador + poder geral do AuraSkills.
+player: "<papi:luckperms_prefix><reset><displayname> <dark_gray>[</dark_gray><aqua><papi:auraskills_power></aqua><dark_gray>]</dark_gray>"
+
+# 20 ticks = 1 segundo. 40 ticks = atualização a cada 2 segundos.
+update-ticks: 40
+
+# Mantido desligado até as permissões de ordem serem definidas no LuckPerms.
+sort-users:
+  enabled: false
+  sort-order:
+    100: "loghorizon.tab.dono"
+    90: "loghorizon.tab.admin"
+    80: "loghorizon.tab.moderador"
+    10: "loghorizon.tab.membro"
+
+# O prefixo do LuckPerms já cuida da aparência dos cargos.
+permission-formatting:
+  enabled: false
+  formats:
+    dono:
+      permission: "loghorizon.tab.dono"
+      format: "<gradient:#FDE68A:#F59E0B><bold>DONO</bold></gradient> <displayname>"
+      priority: 100
+    admin:
+      permission: "loghorizon.tab.admin"
+      format: "<red><bold>ADMIN</bold></red> <displayname>"
+      priority: 90
+    moderador:
+      permission: "loghorizon.tab.moderador"
+      format: "<aqua><bold>MOD</bold></aqua> <displayname>"
+      priority: 80
+
+# Animação desligada para evitar piscadas e manter boa compatibilidade no Bedrock.
+animated:
+  enabled: false
+  delay: 10
+  delay-ticks: 10
+  header:
+    - "<gradient:#67E8F9:#818CF8><bold>LOG HORIZON</bold></gradient>"
+  footer:
+    - "<gray>Java e Bedrock</gray>"
