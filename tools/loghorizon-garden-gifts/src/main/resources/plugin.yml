@@ -1,0 +1,18 @@
+name: LogHorizonGardenGifts
+version: 1.0.0
+main: br.com.loghorizon.gardengifts.LogHorizonGardenGifts
+api-version: '1.21'
+author: Log Horizon
+description: Integra frutas do GardenPlus aos presentes do RealisticVillagers.
+softdepend:
+  - RealisticVillagers
+  - LogHorizonGardenPlus
+commands:
+  lhgardengifts:
+    description: Status e recarga do LogHorizonGardenGifts
+    usage: /lhgardengifts <status|reload>
+    aliases: [lhgg]
+permissions:
+  loghorizon.gardengifts.admin:
+    description: Permite gerenciar o LogHorizonGardenGifts
+    default: op
