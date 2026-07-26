@@ -1,0 +1,27 @@
+LOG HORIZON - SIMPLECUSTOMTAB 1.1.1
+
+Este pacote contém somente arquivos diretos. Não há outro arquivo compactado dentro dele.
+
+INSTALAÇÃO
+1. Desligue completamente o servidor.
+2. Mantenha o arquivo SimpleCustomTab-1.1.1.jar já instalado.
+3. Substitua plugins/SimpleCustomTab/config.yml pelo config.yml deste pacote.
+4. Ligue o servidor normalmente.
+5. Para recarregar alterações futuras, use o comando próprio do plugin.
+
+ALTERAÇÕES
+- Identidade visual do Log Horizon.
+- Compatibilidade visual com Java e Bedrock.
+- Prefixo do LuckPerms antes do nome.
+- Poder geral do AuraSkills ao lado de cada jogador.
+- Poder e Agricultura no rodapé.
+- Atualização a cada 2 segundos.
+- Animações desativadas para evitar piscadas no celular.
+- Ordenação por permissões preparada, mas desligada.
+
+PLACEHOLDERS
+- luckperms_prefix
+- auraskills_power
+- auraskills_farming
+
+Caso o prefixo do LuckPerms não apareça, confira se a expansão do LuckPerms está instalada no PlaceholderAPI.
