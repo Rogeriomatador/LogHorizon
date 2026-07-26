@@ -1,0 +1,39 @@
+LOG HORIZON — GARDEN GIFTS 1.0.0
+==================================
+
+INSTALAÇÃO
+1. Desligue completamente o servidor.
+2. Mantenha instalados:
+   - Garden-2.0.1.jar
+   - LogHorizonGardenPlus.jar
+   - RealisticVillagers-3.3.6.10.jar
+3. Envie LogHorizonGardenGifts.jar diretamente para a pasta plugins/.
+4. Ligue o servidor.
+5. Execute /lhgardengifts status.
+
+O resultado esperado é:
+- Hook de presentes: ATIVO
+- RealisticVillagers: ATIVO
+- LogHorizonGardenPlus: ATIVO
+
+Não substitua o GardenPlus. Este é um complemento separado.
+
+COMO USAR
+Use normalmente a opção de presentear do RealisticVillagers e entregue uma fruta do GardenPlus.
+
+REPUTAÇÃO ALVO
+- Fruta normal: +2
+- Fruta de Qualidade: +4
+- Fruta Perfeita: +7
+- Semente para agricultor: +3
+- Maçã ou morango para criança: +1 adicional
+- Cereja ou pêssego para parceiro: +1 adicional
+
+O cooldown e o limite do RealisticVillagers continuam sendo respeitados. Quando o presente nativo não gera reputação por limite ou cooldown, o complemento não força o bônus.
+
+COMANDOS
+/lhgardengifts status
+/lhgardengifts reload
+
+CONFIGURAÇÃO
+A pasta plugins/LogHorizonGardenGifts/ e o config.yml são criados automaticamente.
