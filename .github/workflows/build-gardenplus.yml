@@ -7,6 +7,12 @@ on:
     paths:
       - 'gardenplus/**'
       - '.github/workflows/build-gardenplus.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'gardenplus/**'
+      - '.github/workflows/build-gardenplus.yml'
   workflow_dispatch:
 
 permissions:
