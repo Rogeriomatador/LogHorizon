@@ -19,28 +19,33 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-      - name: Clonar fontes oficiais
+      - name: Baixar Garden 2.0.1 oficial
         run: |
-          git clone --quiet --depth 1 https://github.com/BreweryTeam/Garden.git /tmp/Garden
-          git clone --quiet --depth 1 https://github.com/GeyserExtensionists/GeyserDisplayEntity.git /tmp/GeyserDisplayEntity
+          VERSION_JSON="$(curl -fsSL 'https://api.modrinth.com/v2/project/ePND7F16/version')"
+          DOWNLOAD_URL="$(printf '%s' "$VERSION_JSON" | jq -r '.[] | select(.version_number == "2.0.1") | .files[] | select(.primary == true) | .url' | head -n 1)"
+          test -n "$DOWNLOAD_URL"
+          curl -fsSL "$DOWNLOAD_URL" -o /tmp/Garden-2.0.1.jar
+          rm -rf /tmp/GardenJar
+          mkdir -p /tmp/GardenJar
+          unzip -q /tmp/Garden-2.0.1.jar -d /tmp/GardenJar
 
       - name: Instalar analisador YAML
         run: python -m pip install --quiet --disable-pip-version-check pyyaml
 
-      - name: Gerar arquivos do Garden para Bedrock
+      - name: Gerar suporte Bedrock exato
         shell: bash
         run: |
           python - <<'PY'
           from __future__ import annotations
 
           import base64
+          import json
           import re
           from pathlib import Path
-          from typing import Any
 
           import yaml
 
-          garden = Path('/tmp/Garden')
+          root = Path('/tmp/GardenJar')
           out = Path('garden-bedrock-output')
           out.mkdir(parents=True, exist_ok=True)
 
@@ -49,143 +54,102 @@ jobs:
               'lemon', 'lime', 'orange', 'peach', 'raspberry', 'strawberry'
           ]
 
-          text_exts = {'.yml', '.yaml', '.json', '.properties', '.txt'}
-          all_text_files: list[Path] = []
-          for p in garden.rglob('*'):
-              if p.is_file() and p.suffix.lower() in text_exts:
-                  all_text_files.append(p)
+          texture_url_re = re.compile(r'textures\.minecraft\.net/texture/([0-9a-fA-F]{32,128})')
+          vanilla: dict[str, str] = {}
+          skulls: dict[str, str] = {}
+          source_files: dict[str, str] = {}
 
-          candidates: dict[str, list[Path]] = {s: [] for s in species}
-          for p in all_text_files:
-              rel = str(p.relative_to(garden)).lower()
+          def texture_hash_from_base64(value: str) -> str:
+              padded = value + '=' * ((4 - len(value) % 4) % 4)
+              decoded = base64.b64decode(padded, validate=False).decode('utf-8')
               try:
-                  text = p.read_text(encoding='utf-8', errors='ignore')
+                  data = json.loads(decoded)
+                  url = data['textures']['SKIN']['url']
+                  match = texture_url_re.search(url)
               except Exception:
-                  continue
-              low = text.lower()
-              for s in species:
-                  if s in rel or re.search(rf'(?<![a-z]){re.escape(s)}(?![a-z])', low):
-                      candidates[s].append(p)
+                  match = texture_url_re.search(decoded)
+              if not match:
+                  raise ValueError('Base64 sem URL de textura válida')
+              return match.group(1).lower()
 
-          hash_re = re.compile(r'textures\.minecraft\.net/texture/([0-9a-fA-F]{32,128})')
-          hex64_re = re.compile(r'^[0-9a-fA-F]{64}$')
-          base64_re = re.compile(r'(?<![A-Za-z0-9+/])([A-Za-z0-9+/]{80,}={0,2})(?![A-Za-z0-9+/])')
-          material_re = re.compile(r'^[A-Z][A-Z0-9_]{2,}$')
+          for name in species:
+              matches = list(root.rglob(f'plants/{name}/plant.yml'))
+              if len(matches) != 1:
+                  raise RuntimeError(f'{name}: esperava 1 plant.yml e encontrei {len(matches)}')
+              path = matches[0]
+              source_files[name] = str(path.relative_to(root))
+              data = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
+              fruit = data.get('fruit') or {}
 
-          hashes: set[str] = set()
-          material_hits: list[tuple[str, str, str]] = []
-          diagnostics: list[str] = []
+              material = fruit.get('material')
+              texture_b64 = fruit.get('head-texture-base64')
+              texture_hash = fruit.get('head-texture') or fruit.get('texture-hash')
 
-          def decode_b64_candidates(text: str) -> None:
-              for token in base64_re.findall(text):
-                  try:
-                      padded = token + '=' * ((4 - len(token) % 4) % 4)
-                      decoded = base64.b64decode(padded, validate=False).decode('utf-8', errors='ignore')
-                  except Exception:
-                      continue
-                  for h in hash_re.findall(decoded):
-                      hashes.add(h.lower())
+              if material:
+                  vanilla[name] = str(material).lower().removeprefix('minecraft:')
+              elif texture_b64:
+                  skulls[name] = texture_hash_from_base64(str(texture_b64))
+              elif texture_hash:
+                  raw = str(texture_hash)
+                  match = texture_url_re.search(raw)
+                  skulls[name] = (match.group(1) if match else raw).lower()
+              else:
+                  raise RuntimeError(f'{name}: fruta sem material e sem textura de cabeça')
 
-          def walk(node: Any, path: list[str], species_name: str) -> None:
-              if isinstance(node, dict):
-                  for k, v in node.items():
-                      walk(v, path + [str(k)], species_name)
-              elif isinstance(node, list):
-                  for i, v in enumerate(node):
-                      walk(v, path + [str(i)], species_name)
-              elif isinstance(node, str):
-                  val = node.strip()
-                  keypath = '.'.join(path).lower()
-                  for h in hash_re.findall(val):
-                      hashes.add(h.lower())
-                  if hex64_re.fullmatch(val) and any(k in keypath for k in ('texture', 'skin', 'head', 'profile')):
-                      hashes.add(val.lower())
-                  if material_re.fullmatch(val) and any(k in keypath for k in ('fruit', 'drop', 'harvest', 'item', 'material', 'head')):
-                      material_hits.append((species_name, '.'.join(path), val))
-                  decode_b64_candidates(val)
+          assert len(vanilla) + len(skulls) == len(species)
+          assert len(vanilla) == 2, f'Esperava 2 frutas vanilla, encontrei {len(vanilla)}: {vanilla}'
+          assert len(skulls) == 9, f'Esperava 9 frutas em cabeças, encontrei {len(skulls)}: {skulls}'
+          assert len(set(skulls.values())) == len(skulls), 'Há hashes duplicados entre espécies'
 
-          seen_files: set[Path] = set()
-          for s in species:
-              diagnostics.append(f'=== {s.upper()} ===')
-              unique = sorted(set(candidates[s]), key=lambda p: str(p))
-              for p in unique:
-                  rel = p.relative_to(garden)
-                  diagnostics.append(str(rel))
-                  if p in seen_files:
-                      continue
-                  seen_files.add(p)
-                  text = p.read_text(encoding='utf-8', errors='ignore')
-                  for h in hash_re.findall(text):
-                      hashes.add(h.lower())
-                  decode_b64_candidates(text)
-                  if p.suffix.lower() in {'.yml', '.yaml', '.json'}:
-                      try:
-                          data = yaml.safe_load(text)
-                      except Exception:
-                          data = None
-                      if data is not None:
-                          walk(data, [], s)
-
-          for p in all_text_files:
-              text = p.read_text(encoding='utf-8', errors='ignore')
-              if 'PLAYER_HEAD' not in text and 'textures.minecraft.net/texture/' not in text:
-                  continue
-              for h in hash_re.findall(text):
-                  hashes.add(h.lower())
-              decode_b64_candidates(text)
-              if p.suffix.lower() in {'.yml', '.yaml', '.json'}:
-                  try:
-                      data = yaml.safe_load(text)
-                  except Exception:
-                      data = None
-                  if data is not None:
-                      walk(data, [], 'global')
-
-          hashes = {h for h in hashes if 32 <= len(h) <= 128}
-          sorted_hashes = sorted(hashes)
-
-          mapping = '''# Log Horizon - Garden no Bedrock\n# Coloque em:\n# plugins/Geyser-Spigot/extensions/geyserdisplayentity/Mappings/garden_fruits.yml\n\nmappings:\n  garden_apple:\n    type: minecraft:apple\n    model-data: -1\n    item-identifier: none\n'''
+          mapping_lines = [
+              '# Log Horizon - Garden 2.0.1 no Bedrock',
+              '# Destino:',
+              '# plugins/Geyser-Spigot/extensions/geyserdisplayentity/Mappings/garden_fruits.yml',
+              '',
+              'mappings:'
+          ]
+          for name, material in vanilla.items():
+              mapping_lines.extend([
+                  f'  garden_{name}:',
+                  f'    type: minecraft:{material}',
+                  '    model-data: -1',
+                  '    item-identifier: none'
+              ])
+          mapping = '\n'.join(mapping_lines) + '\n'
           (out / 'garden_fruits.yml').write_text(mapping, encoding='utf-8')
 
+          unique_hashes = list(dict.fromkeys(skulls.values()))
           skull_lines = [
-              '# Log Horizon - texturas das frutas do Garden',
-              '# NÃO substitua seu custom-skulls.yml se ele já tiver outras cabeças.',
-              '# Copie somente as linhas com hífen para dentro da seção skin-hashes existente.',
+              '# Log Horizon - texturas das frutas do Garden 2.0.1',
+              '# NÃO substitua custom-skulls.yml inteiro.',
+              '# Copie somente as linhas com hífen para a seção skin-hashes existente.',
               'skin-hashes:'
           ]
-          skull_lines.extend(f'  - {h}' for h in sorted_hashes)
+          skull_lines.extend(f'  - {value}' for value in unique_hashes)
           (out / 'custom-skulls-GARDEN-ADICIONAR.yml').write_text('\n'.join(skull_lines) + '\n', encoding='utf-8')
-          (out / 'garden-skin-hashes.txt').write_text('\n'.join(f'  - {h}' for h in sorted_hashes) + '\n', encoding='utf-8')
+          (out / 'garden-skin-hashes.txt').write_text('\n'.join(f'  - {value}' for value in unique_hashes) + '\n', encoding='utf-8')
 
-          install = f'''LOG HORIZON - GARDEN VISÍVEL NO BEDROCK\n\nARQUIVO 1: garden_fruits.yml\nDestino:\nplugins/Geyser-Spigot/extensions/geyserdisplayentity/Mappings/garden_fruits.yml\n\nEste arquivo faz a maçã normal do Minecraft deixar de ser escondida pelo modo\n"hide-unmapped-vanilla-displays: true" usado na correção das portas.\n\nARQUIVO 2: garden-skin-hashes.txt\nDestino das linhas:\nplugins/Geyser-Spigot/custom-skulls.yml\n\nAbra custom-skulls.yml e localize:\nskin-hashes:\n\nCole abaixo dela as linhas do arquivo garden-skin-hashes.txt.\nNão crie uma segunda seção skin-hashes e não apague cabeças que já existam.\n\nCONFIG DO GEYSER:\nNo plugins/Geyser-Spigot/config.yml, confirme que a opção atual equivalente a\ngameplay.enable-custom-content está ativada (true).\n\nIMPORTANTE:\n- Mantenha GeyserDisplayEntity-1.0.11-LH-DOORS-FIX3.jar.\n- Não substitua o mapeamento das portas. garden_fruits.yml é um arquivo separado.\n- Desligue e ligue o servidor completamente; não use /reload.\n- O Geyser gerará novamente o pacote de cabeças na inicialização.\n- No celular, feche o Minecraft, apague os dados em cache do pacote Log Horizon/Geyser,\n  entre novamente e aceite o pacote atualizado.\n\nTESTE:\n1. Observe uma macieira: a maçã precisa aparecer presa à árvore.\n2. Observe uma videira: a uva precisa usar a textura correta, não a cabeça do Steve.\n3. Colha as duas para confirmar que GardenPlus, XP e qualidade continuam normais.\n\nTEXTURAS ENCONTRADAS AUTOMATICAMENTE: {len(sorted_hashes)}\n'''
+          diagnostic = [
+              'Garden verificado: 2.0.1 oficial do Modrinth',
+              f'Frutas vanilla: {len(vanilla)}',
+              f'Frutas com cabeça personalizada: {len(skulls)}',
+              ''
+          ]
+          for name in species:
+              if name in vanilla:
+                  diagnostic.append(f'{name}: VANILLA minecraft:{vanilla[name]} | {source_files[name]}')
+              else:
+                  diagnostic.append(f'{name}: SKULL {skulls[name]} | {source_files[name]}')
+          (out / 'DIAGNOSTICO.txt').write_text('\n'.join(diagnostic) + '\n', encoding='utf-8')
+
+          vanilla_names = ', '.join(f'{name}=minecraft:{material}' for name, material in vanilla.items())
+          install = f'''LOG HORIZON - GARDEN 2.0.1 VISÍVEL NO BEDROCK\n\nVALIDAÇÃO AUTOMÁTICA:\n- Frutas vanilla: {vanilla_names}\n- Cabeças personalizadas registradas: {len(skulls)}\n\nARQUIVO 1: garden_fruits.yml\nDestino:\nplugins/Geyser-Spigot/extensions/geyserdisplayentity/Mappings/garden_fruits.yml\n\nNão substitua animated_doors.yml. Os dois arquivos devem permanecer na pasta Mappings.\nEste mapeamento permite mostrar as frutas vanilla mesmo com:\nhide-unmapped-vanilla-displays: true\n\nARQUIVO 2: garden-skin-hashes.txt\nAs linhas deste arquivo devem ser adicionadas em:\nplugins/Geyser-Spigot/custom-skulls.yml\n\nLocalize a seção já existente:\nskin-hashes:\n\ne cole abaixo dela as linhas iniciadas por hífen. Não crie uma segunda seção\nskin-hashes e não apague hashes que já estejam no arquivo.\n\nCONFIGURAÇÃO DO GEYSER:\nConfirme em plugins/Geyser-Spigot/config.yml que o conteúdo personalizado está\nativado, na opção atual equivalente a gameplay.enable-custom-content: true.\n\nPROCEDIMENTO:\n1. Desligue completamente o servidor.\n2. Instale garden_fruits.yml no destino indicado.\n3. Mescle as linhas de garden-skin-hashes.txt em custom-skulls.yml.\n4. Mantenha GeyserDisplayEntity-1.0.11-LH-DOORS-FIX3.jar sem alterações.\n5. Ligue o servidor e aguarde o Geyser gerar/atualizar o pacote de cabeças.\n6. Feche o Minecraft Bedrock no celular.\n7. Apague o pacote Log Horizon/Geyser em Configurações > Armazenamento > Dados em cache.\n8. Entre novamente e aceite o pacote atualizado.\n\nTESTE:\n- As frutas vanilla devem aparecer presas às plantas.\n- A uva e as demais frutas em cabeças devem usar suas texturas, não Steve.\n- A colheita, o XP, as qualidades e as plantas férteis continuam no GardenPlus.\n'''
           (out / 'INSTALACAO.txt').write_text(install, encoding='utf-8')
 
-          report = []
-          report.append(f'Arquivos de texto analisados: {len(all_text_files)}')
-          report.append(f'Hashes encontrados: {len(sorted_hashes)}')
-          report.extend(f'HASH {h}' for h in sorted_hashes)
-          report.append('')
-          report.append('Materiais candidatos:')
-          for s, path, material in sorted(set(material_hits)):
-              report.append(f'{s}: {path} = {material}')
-          report.append('')
-          report.append('Arquivos candidatos por espécie:')
-          report.extend(diagnostics)
-          (out / 'DIAGNOSTICO.txt').write_text('\n'.join(report) + '\n', encoding='utf-8')
-
-          assert 'minecraft:apple' in mapping
-          assert len(sorted_hashes) >= 8, f'Poucas texturas encontradas: {len(sorted_hashes)}'
-          assert (out / 'garden_fruits.yml').stat().st_size > 80
-          assert (out / 'garden-skin-hashes.txt').stat().st_size > 100
-
-          print(f'Hashes de frutas encontrados: {len(sorted_hashes)}')
-          for h in sorted_hashes:
-              print('HASH', h)
-          for s, path, material in sorted(set(material_hits)):
-              print(f'MATERIAL {s}: {path} = {material}')
+          print('\n'.join(diagnostic))
           PY
 
-      - name: Validar YAML gerado
+      - name: Validar YAML e checksums
         run: |
           python - <<'PY'
           import yaml
@@ -196,9 +160,6 @@ jobs:
                   yaml.safe_load(f)
               print('YAML válido:', name)
           PY
-
-      - name: Gerar checksums
-        run: |
           cd garden-bedrock-output
           sha256sum garden_fruits.yml custom-skulls-GARDEN-ADICIONAR.yml garden-skin-hashes.txt INSTALACAO.txt DIAGNOSTICO.txt > SHA256.txt
 
