@@ -1,0 +1,52 @@
+name: Build SimpleCustomTab Visual V2
+
+on:
+  pull_request:
+    paths:
+      - 'simplecustomtab-visual-v2/**'
+      - '.github/workflows/build-simplecustomtab-visual-v2.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validar configuração
+        run: |
+          grep -q 'LOG HORIZON' simplecustomtab-visual-v2/config.yml
+          grep -q '<papi:auraskills_power>' simplecustomtab-visual-v2/config.yml
+          grep -q '<papi:auraskills_farming>' simplecustomtab-visual-v2/config.yml
+          grep -q 'animated:' simplecustomtab-visual-v2/config.yml
+
+      - name: Gerar pacote direto
+        run: |
+          mkdir -p dist
+          cp simplecustomtab-visual-v2/config.yml dist/config.yml
+          cp simplecustomtab-visual-v2/INSTALACAO.txt dist/INSTALACAO.txt
+          cp simplecustomtab-visual-v2/PREVIA.txt dist/PREVIA.txt
+          cd dist
+          sha256sum config.yml INSTALACAO.txt PREVIA.txt > SHA256.txt
+          zip -9 LogHorizon-SimpleCustomTab-1.1.1-VISUAL-V2.zip config.yml INSTALACAO.txt PREVIA.txt SHA256.txt
+          unzip -t LogHorizon-SimpleCustomTab-1.1.1-VISUAL-V2.zip
+          python3 - <<'PY'
+          import zipfile
+          p = 'LogHorizon-SimpleCustomTab-1.1.1-VISUAL-V2.zip'
+          with zipfile.ZipFile(p) as z:
+              names = z.namelist()
+              expected = {'config.yml', 'INSTALACAO.txt', 'PREVIA.txt', 'SHA256.txt'}
+              assert set(names) == expected, names
+              assert not any(n.lower().endswith(('.zip', '.rar', '.7z', '.tar', '.gz')) for n in names)
+          print('Pacote validado:', names)
+          PY
+
+      - name: Enviar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizon-SimpleCustomTab-1.1.1-VISUAL-V2
+          path: dist/LogHorizon-SimpleCustomTab-1.1.1-VISUAL-V2.zip
+          if-no-files-found: error
