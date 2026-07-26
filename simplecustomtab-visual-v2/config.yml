@@ -1,0 +1,54 @@
+# Log Horizon - SimpleCustomTab 1.1.1
+# Visual V2: mais identidade, melhor hierarquia e compatibilidade Java/Bedrock.
+
+header:
+  - ""
+  - "<gradient:#00D9FF:#7A5CFF><bold>✦ LOG HORIZON ✦</bold></gradient>"
+  - "<gray>Uma nova aventura começa a cada horizonte</gray>"
+  - "<gradient:#2B6CB0:#00D9FF>━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>"
+  - "<white>Bem-vindo, <aqua><bold><displayname></bold></aqua></white>"
+  - "<dark_gray>Java + Bedrock  •  RPG  •  Sobrevivência</dark_gray>"
+  - ""
+
+footer:
+  - ""
+  - "<gradient:#7A5CFF:#00D9FF>━━━━━━━━━━━━━━━━━━━━━━━━━━━━</gradient>"
+  - "<gold><bold>PODER</bold></gold> <white><papi:auraskills_power></white> <dark_gray>│</dark_gray> <green><bold>AGRICULTURA</bold></green> <white><papi:auraskills_farming></white>"
+  - "<gray>Use <aqua>/skills</aqua> para acompanhar sua evolução</gray>"
+  - "<gradient:#00D9FF:#7A5CFF>✦ Explore • Evolua • Construa sua história ✦</gradient>"
+  - ""
+
+player: "<papi:luckperms_prefix><white><displayname></white> <dark_gray>•</dark_gray> <aqua><papi:player_ping>ms</aqua>"
+
+# Atualiza a cada 2 segundos: responsivo sem gerar atualizações excessivas.
+update-ticks: 40
+
+# Mantido desligado para evitar piscadas e inconsistências no Bedrock.
+animated:
+  enabled: false
+  delay-ticks: 10
+  header: []
+  footer: []
+
+# A ordem pode ser ativada depois, quando as permissões dos cargos estiverem definidas.
+sort-users:
+  enabled: false
+  sort-order:
+    5: "tablist.order.admin"
+    4: "tablist.order.mod"
+    3: "tablist.order.vip"
+    2: "tablist.order.veteran"
+    1: "tablist.order.member"
+
+# O prefixo do LuckPerms já é usado na linha player, evitando formatos duplicados.
+permission-formatting:
+  enabled: false
+  formats:
+    admin:
+      permission: "tablist.formatting.admin"
+      format: "<red><bold>ADMIN</bold></red> <displayname>"
+      priority: 5
+    mod:
+      permission: "tablist.formatting.mod"
+      format: "<gold><bold>MOD</bold></gold> <displayname>"
+      priority: 4
