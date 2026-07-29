@@ -4,9 +4,9 @@ const CONFIG = {
   bedrockPort: "10167",
   discordUrl: "https://discord.gg/wCxTJY3W7G",
   apkUrl: "downloads/LogHorizonVoice-latest.apk",
-  apkVersion: "0.5.0",
+  apkVersion: "0.5.1",
   nextApkVersion: "0.5.1",
-  releaseReady: false,
+  releaseReady: true,
   voiceWebUrl: "http://enx-cirion-84.enx.host:10057/loghorizon.html",
   voiceTutorialUrl: "voz-pc.html"
 };

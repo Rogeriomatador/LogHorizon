@@ -1,9 +1,9 @@
 {
   "enabled": true,
-  "versionCode": 7,
-  "versionName": "0.5.0",
+  "versionCode": 8,
+  "versionName": "0.5.1",
   "apkUrl": "https://rogeriomatador.github.io/LogHorizon/downloads/LogHorizonVoice-latest.apk",
-  "sha256": "7a7e7e1ea911db4f8d70916de859d67cabc470f162daafaee05012bc37397c2b",
+  "sha256": "44112a4bf7bc9565af63e19477236b2c4038fc94e07c4325fc6178ca2c82ee94",
   "mandatory": false,
-  "releaseNotes": "Nova interface oficial roxa, tela Preparar para jogar, melhorias específicas para aparelhos Samsung, recuperação automática do microfone durante o Minecraft e maior estabilidade da captura de áudio."
+  "releaseNotes": "Novo HUD flutuante compacto e arrastável sobre o Minecraft, painel expansível com controles de voz, indicadores de conexão e microfone em tempo real, migração da bolha anterior e melhorias de estabilidade."
 }
