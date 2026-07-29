@@ -82,19 +82,29 @@ jobs:
           NEW_CERT="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/new-signature.txt | head -n 1 | tr '[:upper:]' '[:lower:]')"
           test -n "$NEW_CERT"
 
-          PREVIOUS_CHANGE="$(git log --format='%H' -- "$APK" | sed -n '2p')"
-          test -n "$PREVIOUS_CHANGE" || {
-            echo "Não foi possível localizar o APK público anterior no histórico."
+          OLD_CERT=""
+          OLD_COMMIT=""
+          while read -r candidate_commit; do
+            test -n "$candidate_commit" || continue
+            if git show "$candidate_commit:$APK" > /tmp/previous-candidate.apk 2>/dev/null &&
+               "$APKSIGNER" verify --verbose --print-certs /tmp/previous-candidate.apk > /tmp/candidate-signature.txt 2>/dev/null; then
+              candidate_cert="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/candidate-signature.txt | head -n 1 | tr '[:upper:]' '[:lower:]')"
+              if test -n "$candidate_cert"; then
+                OLD_CERT="$candidate_cert"
+                OLD_COMMIT="$candidate_commit"
+                break
+              fi
+            fi
+          done < <(git log --format='%H' --skip=1 -- "$APK")
+
+          test -n "$OLD_CERT" || {
+            echo "Não foi possível localizar uma versão pública anterior assinada no histórico."
             exit 1
           }
-          git show "$PREVIOUS_CHANGE:$APK" > /tmp/previous-public.apk
-          test -s /tmp/previous-public.apk
-          "$APKSIGNER" verify --verbose --print-certs /tmp/previous-public.apk | tee /tmp/old-signature.txt
-          OLD_CERT="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/old-signature.txt | head -n 1 | tr '[:upper:]' '[:lower:]')"
-          test -n "$OLD_CERT"
 
           test "$NEW_CERT" = "$OLD_CERT" || {
-            echo "A assinatura da 0.5.1 não corresponde à versão pública anterior."
+            echo "A assinatura da 0.5.1 não corresponde à última versão pública assinada."
+            echo "Commit anterior assinado: $OLD_COMMIT"
             echo "Anterior: $OLD_CERT"
             echo "Nova:     $NEW_CERT"
             exit 1
