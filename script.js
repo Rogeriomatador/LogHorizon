@@ -5,6 +5,8 @@ const CONFIG = {
   discordUrl: "https://discord.gg/wCxTJY3W7G",
   apkUrl: "downloads/LogHorizonVoice-latest.apk",
   apkVersion: "0.5.0",
+  nextApkVersion: "0.5.1",
+  releaseReady: false,
   voiceWebUrl: "http://enx-cirion-84.enx.host:10057/loghorizon.html",
   voiceTutorialUrl: "voz-pc.html"
 };
@@ -17,7 +19,23 @@ const toast = document.querySelector(".toast");
 async function configureDownload() {
   const downloadButton = document.querySelector(".download-button");
   const note = document.querySelector(".download-note");
-  if (!CONFIG.apkUrl || !downloadButton) return;
+  const version = document.querySelector(".download-version");
+  if (!downloadButton) return;
+
+  if (!CONFIG.releaseReady) {
+    if (version) {
+      version.textContent = `Android • V${CONFIG.apkVersion} pública • V${CONFIG.nextApkVersion} em preparação`;
+    }
+    downloadButton.disabled = true;
+    downloadButton.textContent = `V${CONFIG.nextApkVersion} EM PREPARAÇÃO`;
+    downloadButton.title = `A versão ${CONFIG.nextApkVersion} aguarda o APK release assinado`;
+    if (note) {
+      note.innerHTML = `A versão ${CONFIG.nextApkVersion} já foi compilada e testada, mas ainda aguarda a assinatura oficial. <a href="${CONFIG.apkUrl}" download="LogHorizonVoice-latest.apk">Baixar versão estável ${CONFIG.apkVersion}</a>.`;
+    }
+    return;
+  }
+
+  if (!CONFIG.apkUrl) return;
 
   try {
     const response = await fetch(CONFIG.apkUrl, { method: "HEAD", cache: "no-store" });
@@ -26,7 +44,8 @@ async function configureDownload() {
     downloadButton.disabled = false;
     downloadButton.textContent = `BAIXAR V${CONFIG.apkVersion}`;
     downloadButton.title = "Baixar Log Horizon Voice";
-    note.textContent = "Download oficial da versão release assinada para Android.";
+    if (version) version.textContent = `Android • Versão ${CONFIG.apkVersion}`;
+    if (note) note.textContent = "Download oficial da versão release assinada para Android.";
 
     downloadButton.addEventListener("click", () => {
       const anchor = document.createElement("a");
