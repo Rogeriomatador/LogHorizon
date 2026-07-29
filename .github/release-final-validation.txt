@@ -1,0 +1,1 @@
+Validar release Android 0.5.1 assinada enviada em 2026-07-29.
