@@ -1,0 +1,93 @@
+name: Diagnosticar release Log Horizon Voice
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "downloads/LogHorizonVoice-latest.apk"
+      - "downloads/app-release.apk"
+      - ".github/workflows/diagnose-loghorizon-voice-release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar repositório com histórico
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Inspecionar APKs
+        shell: bash
+        run: |
+          set -u
+          APK="downloads/LogHorizonVoice-latest.apk"
+          COPY="downloads/app-release.apk"
+          OLD_COMMIT="50bd65dc37d130f763f5764c002abb7e27b7e995"
+          AAPT="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+
+          IDENTICAL=false
+          [ -s "$APK" ] && [ -s "$COPY" ] && cmp --silent "$APK" "$COPY" && IDENTICAL=true
+
+          BADGING="$($AAPT dump badging "$APK" 2>/tmp/aapt-error.txt || true)"
+          PACKAGE_NAME="$(sed -n "s/^package: name='\([^']*\)'.*/\1/p" <<< "$BADGING")"
+          VERSION_CODE="$(sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p" <<< "$BADGING")"
+          VERSION_NAME="$(sed -n "s/^package:.*versionName='\([^']*\)'.*/\1/p" <<< "$BADGING")"
+          DEBUGGABLE=false
+          grep -q '^application-debuggable' <<< "$BADGING" && DEBUGGABLE=true
+
+          NEW_VERIFY="$($APKSIGNER verify --verbose --print-certs "$APK" 2>&1 || true)"
+          NEW_SIGNED=false
+          grep -q '^Verifies$' <<< "$NEW_VERIFY" && NEW_SIGNED=true
+          NEW_CERT="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' <<< "$NEW_VERIFY" | head -n 1 | tr '[:upper:]' '[:lower:]')"
+
+          OLD_SIGNED=false
+          OLD_CERT=""
+          if git cat-file -e "$OLD_COMMIT:$APK" 2>/dev/null; then
+            git show "$OLD_COMMIT:$APK" > /tmp/official-050.apk
+            OLD_VERIFY="$($APKSIGNER verify --verbose --print-certs /tmp/official-050.apk 2>&1 || true)"
+            grep -q '^Verifies$' <<< "$OLD_VERIFY" && OLD_SIGNED=true
+            OLD_CERT="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' <<< "$OLD_VERIFY" | head -n 1 | tr '[:upper:]' '[:lower:]')"
+          fi
+
+          SAME_CERT=false
+          [ -n "$NEW_CERT" ] && [ "$NEW_CERT" = "$OLD_CERT" ] && SAME_CERT=true
+          SHA256="$(sha256sum "$APK" | awk '{print $1}')"
+          SIZE="$(stat -c '%s' "$APK")"
+
+          python3 - <<PY
+          import json
+          from pathlib import Path
+          report = {
+            "identicalCopies": ${IDENTICAL},
+            "packageName": "${PACKAGE_NAME}",
+            "versionCode": "${VERSION_CODE}",
+            "versionName": "${VERSION_NAME}",
+            "debuggable": ${DEBUGGABLE},
+            "newApkSigned": ${NEW_SIGNED},
+            "oldApkSigned": ${OLD_SIGNED},
+            "sameSigningCertificateAs050": ${SAME_CERT},
+            "newCertificateSha256": "${NEW_CERT}",
+            "oldCertificateSha256": "${OLD_CERT}",
+            "apkSha256": "${SHA256}",
+            "sizeBytes": ${SIZE},
+          }
+          Path("release-validation.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          PY
+
+      - name: Registrar diagnóstico
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release-validation.json
+          git commit -m "Registrar validação da release Android 0.5.1" || exit 0
+          git push
