@@ -5,7 +5,7 @@ on:
     branches:
       - feature/voice-web-desktop-v3
     paths:
-      - "voice-web-source.tar.gz.b64"
+      - "voice-web-source.tar.gz"
       - ".github/workflows/build-voice-web.yml"
   workflow_dispatch:
 
@@ -24,7 +24,6 @@ jobs:
       - name: Restaurar código-fonte da interface
         run: |
           set -euo pipefail
-          base64 --decode voice-web-source.tar.gz.b64 > voice-web-source.tar.gz
           tar -xzf voice-web-source.tar.gz
           test -s voice-web/loghorizon.html
           test -s voice-web/css/loghorizon-v3.css
