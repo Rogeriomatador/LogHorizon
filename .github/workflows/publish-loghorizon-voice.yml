@@ -78,9 +78,19 @@ jobs:
             exit 1
           fi
 
+          extract_cert_digest() {
+            sed -n -E \
+              -e 's/^Signer #[0-9]+ certificate SHA-256 digest: //p' \
+              -e 's/^V[0-9.]+ Signer: certificate SHA-256 digest: //p' \
+              "$1" | head -n 1 | tr '[:upper:]' '[:lower:]'
+          }
+
           "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/new-signature.txt
-          NEW_CERT="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/new-signature.txt | head -n 1 | tr '[:upper:]' '[:lower:]')"
-          test -n "$NEW_CERT"
+          NEW_CERT="$(extract_cert_digest /tmp/new-signature.txt)"
+          test -n "$NEW_CERT" || {
+            echo "Não foi possível extrair o certificado da nova versão."
+            exit 1
+          }
 
           OLD_CERT=""
           OLD_COMMIT=""
@@ -88,7 +98,7 @@ jobs:
             test -n "$candidate_commit" || continue
             if git show "$candidate_commit:$APK" > /tmp/previous-candidate.apk 2>/dev/null &&
                "$APKSIGNER" verify --verbose --print-certs /tmp/previous-candidate.apk > /tmp/candidate-signature.txt 2>/dev/null; then
-              candidate_cert="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/candidate-signature.txt | head -n 1 | tr '[:upper:]' '[:lower:]')"
+              candidate_cert="$(extract_cert_digest /tmp/candidate-signature.txt)"
               if test -n "$candidate_cert"; then
                 OLD_CERT="$candidate_cert"
                 OLD_COMMIT="$candidate_commit"
@@ -170,7 +180,7 @@ jobs:
               count=1,
               flags=re.S,
           )
-          index = re.sub(r'script\.js\?v=[^"]+', 'script.js?v=20260729-3', index, count=1)
+          index = re.sub(r'script\.js\?v=[^"]+', 'script.js?v=20260729-4', index, count=1)
           index_path.write_text(index, encoding="utf-8")
           PY
 
