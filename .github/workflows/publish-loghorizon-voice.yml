@@ -8,13 +8,18 @@ on:
       - "downloads/LogHorizonVoice-latest.apk"
       - "downloads/app-release.apk"
       - ".github/workflows/publish-loghorizon-voice.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/voice-release-validation.txt"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: publish-loghorizon-voice
+  group: publish-loghorizon-voice-${{ github.event_name }}
   cancel-in-progress: false
 
 jobs:
@@ -100,8 +105,10 @@ jobs:
           echo "APK_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
           echo "APK_VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
           echo "APK_CERT_SHA256=$NEW_CERT" >> "$GITHUB_ENV"
+          echo "VALIDAÇÃO CONCLUÍDA: pacote=$PACKAGE_NAME versão=$VERSION_NAME code=$VERSION_CODE sha256=$SHA256 certificado=$NEW_CERT"
 
       - name: Atualizar site e manifesto
+        if: github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
@@ -153,11 +160,12 @@ jobs:
               count=1,
               flags=re.S,
           )
-          index = re.sub(r'script\.js\?v=[^"]+', 'script.js?v=20260729-2', index, count=1)
+          index = re.sub(r'script\.js\?v=[^"]+', 'script.js?v=20260729-3', index, count=1)
           index_path.write_text(index, encoding="utf-8")
           PY
 
       - name: Publicar metadados validados
+        if: github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
