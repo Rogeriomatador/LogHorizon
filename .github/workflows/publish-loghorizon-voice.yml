@@ -1,0 +1,172 @@
+name: Publicar Log Horizon Voice
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "downloads/LogHorizonVoice-latest.apk"
+      - "downloads/app-release.apk"
+      - ".github/workflows/publish-loghorizon-voice.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-loghorizon-voice
+  cancel-in-progress: false
+
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Baixar repositório com histórico
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validar APK oficial
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          APK="downloads/LogHorizonVoice-latest.apk"
+          RELEASE_COPY="downloads/app-release.apk"
+          EXPECTED_PACKAGE="com.loghorizon.voice"
+          EXPECTED_VERSION_CODE="8"
+          EXPECTED_VERSION_NAME="0.5.1"
+
+          test -s "$APK"
+          test -s "$RELEASE_COPY"
+          cmp --silent "$APK" "$RELEASE_COPY" || {
+            echo "Os dois APKs publicados não são idênticos."
+            exit 1
+          }
+
+          AAPT="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          test -x "$AAPT"
+          test -x "$APKSIGNER"
+
+          BADGING="$("$AAPT" dump badging "$APK")"
+          PACKAGE_NAME="$(sed -n "s/^package: name='\([^']*\)'.*/\1/p" <<< "$BADGING")"
+          VERSION_CODE="$(sed -n "s/^package:.*versionCode='\([^']*\)'.*/\1/p" <<< "$BADGING")"
+          VERSION_NAME="$(sed -n "s/^package:.*versionName='\([^']*\)'.*/\1/p" <<< "$BADGING")"
+
+          test "$PACKAGE_NAME" = "$EXPECTED_PACKAGE" || {
+            echo "Pacote inesperado: $PACKAGE_NAME"
+            exit 1
+          }
+          test "$VERSION_CODE" = "$EXPECTED_VERSION_CODE" || {
+            echo "versionCode inesperado: $VERSION_CODE"
+            exit 1
+          }
+          test "$VERSION_NAME" = "$EXPECTED_VERSION_NAME" || {
+            echo "versionName inesperado: $VERSION_NAME"
+            exit 1
+          }
+          if grep -q '^application-debuggable' <<< "$BADGING"; then
+            echo "O APK está marcado como debug e não pode ser publicado."
+            exit 1
+          fi
+
+          "$APKSIGNER" verify --verbose --print-certs "$APK" | tee /tmp/new-signature.txt
+          NEW_CERT="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/new-signature.txt | head -n 1 | tr '[:upper:]' '[:lower:]')"
+          test -n "$NEW_CERT"
+
+          PREVIOUS_CHANGE="$(git log --format='%H' -- "$APK" | sed -n '2p')"
+          test -n "$PREVIOUS_CHANGE" || {
+            echo "Não foi possível localizar o APK público anterior no histórico."
+            exit 1
+          }
+          git show "$PREVIOUS_CHANGE:$APK" > /tmp/previous-public.apk
+          test -s /tmp/previous-public.apk
+          "$APKSIGNER" verify --verbose --print-certs /tmp/previous-public.apk | tee /tmp/old-signature.txt
+          OLD_CERT="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' /tmp/old-signature.txt | head -n 1 | tr '[:upper:]' '[:lower:]')"
+          test -n "$OLD_CERT"
+
+          test "$NEW_CERT" = "$OLD_CERT" || {
+            echo "A assinatura da 0.5.1 não corresponde à versão pública anterior."
+            echo "Anterior: $OLD_CERT"
+            echo "Nova:     $NEW_CERT"
+            exit 1
+          }
+
+          SHA256="$(sha256sum "$APK" | awk '{print $1}')"
+          echo "APK_SHA256=$SHA256" >> "$GITHUB_ENV"
+          echo "APK_VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+          echo "APK_VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
+          echo "APK_CERT_SHA256=$NEW_CERT" >> "$GITHUB_ENV"
+
+      - name: Atualizar site e manifesto
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          version_code = int(os.environ["APK_VERSION_CODE"])
+          version_name = os.environ["APK_VERSION_NAME"]
+          sha256 = os.environ["APK_SHA256"]
+
+          manifest_path = Path("app-update.json")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          manifest.update({
+              "enabled": True,
+              "versionCode": version_code,
+              "versionName": version_name,
+              "apkUrl": "https://rogeriomatador.github.io/LogHorizon/downloads/LogHorizonVoice-latest.apk",
+              "sha256": sha256,
+              "mandatory": False,
+              "releaseNotes": (
+                  "Novo HUD flutuante compacto e arrastável sobre o Minecraft, painel expansível com controles de voz, "
+                  "indicadores de conexão e microfone em tempo real, migração da bolha anterior e melhorias de estabilidade."
+              ),
+          })
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+          script_path = Path("script.js")
+          script = script_path.read_text(encoding="utf-8")
+          script = re.sub(r'apkVersion:\s*"[^"]+"', f'apkVersion: "{version_name}"', script, count=1)
+          script = re.sub(r'nextApkVersion:\s*"[^"]+"', f'nextApkVersion: "{version_name}"', script, count=1)
+          script = re.sub(r'releaseReady:\s*(?:true|false)', 'releaseReady: true', script, count=1)
+          script_path.write_text(script, encoding="utf-8")
+
+          index_path = Path("index.html")
+          index = index_path.read_text(encoding="utf-8")
+          index = re.sub(
+              r'<span class="download-version">.*?</span>',
+              f'<span class="download-version">Android • Versão {version_name}</span>',
+              index,
+              count=1,
+          )
+          index = re.sub(
+              r'<button class="button button-primary download-button" type="button" title="[^"]*">\s*.*?\s*</button>',
+              f'<button class="button button-primary download-button" type="button" title="Baixar Log Horizon Voice {version_name}">\n              BAIXAR V{version_name}\n            </button>',
+              index,
+              count=1,
+              flags=re.S,
+          )
+          index = re.sub(r'script\.js\?v=[^"]+', 'script.js?v=20260729-2', index, count=1)
+          index_path.write_text(index, encoding="utf-8")
+          PY
+
+      - name: Publicar metadados validados
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app-update.json script.js index.html
+          if git diff --cached --quiet; then
+            echo "O site e o manifesto já estavam atualizados."
+            exit 0
+          fi
+          git commit -m "Publicar Log Horizon Voice 0.5.1"
+          git push
