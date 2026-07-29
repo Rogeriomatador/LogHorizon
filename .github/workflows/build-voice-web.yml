@@ -1,0 +1,82 @@
+name: Build Log Horizon Voice Web V3
+
+on:
+  push:
+    branches:
+      - feature/voice-web-desktop-v3
+    paths:
+      - "voice-web-source.tar.gz.b64"
+      - ".github/workflows/build-voice-web.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Restaurar código-fonte da interface
+        run: |
+          set -euo pipefail
+          base64 --decode voice-web-source.tar.gz.b64 > voice-web-source.tar.gz
+          tar -xzf voice-web-source.tar.gz
+          test -s voice-web/loghorizon.html
+          test -s voice-web/css/loghorizon-v3.css
+          test -s voice-web/js/loghorizon-v3.js
+
+      - name: Validar contrato da interface
+        run: |
+          python3 voice-web/validate_voice_web.py
+          node --check voice-web/js/loghorizon-v3.js
+
+      - name: Baixar SimpleVoice-Geyser 0.1.3 oficial
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            "https://cdn.modrinth.com/data/GJLuArlK/versions/cFF8PtQx/Svg-Spigot-0.1.3.jar" \
+            --output Svg-Spigot-0.1.3.jar
+          test -s Svg-Spigot-0.1.3.jar
+          unzip -tq Svg-Spigot-0.1.3.jar
+
+      - name: Inserir interface Log Horizon
+        run: |
+          set -euo pipefail
+          rm -rf patch
+          mkdir -p patch/web/css patch/web/js
+          cp voice-web/loghorizon.html patch/web/loghorizon.html
+          cp voice-web/css/loghorizon-v3.css patch/web/css/loghorizon-v3.css
+          cp voice-web/js/loghorizon-v3.js patch/web/js/loghorizon-v3.js
+          cp Svg-Spigot-0.1.3.jar Svg-Spigot-0.1.3-LogHorizon-v3.jar
+          (
+            cd patch
+            zip -qur ../Svg-Spigot-0.1.3-LogHorizon-v3.jar web
+          )
+
+      - name: Validar JAR final
+        run: |
+          set -euo pipefail
+          unzip -tq Svg-Spigot-0.1.3-LogHorizon-v3.jar
+          unzip -p Svg-Spigot-0.1.3-LogHorizon-v3.jar web/loghorizon.html | grep -F 'window.BUILD_ID = "f5b91f7"'
+          unzip -p Svg-Spigot-0.1.3-LogHorizon-v3.jar web/loghorizon.html | grep -F 'data-svg="form"'
+          unzip -p Svg-Spigot-0.1.3-LogHorizon-v3.jar web/js/loghorizon-v3.js | grep -F 'initLogHorizonUI'
+          sha256sum Svg-Spigot-0.1.3-LogHorizon-v3.jar | tee Svg-Spigot-0.1.3-LogHorizon-v3.sha256
+
+      - name: Empacotar código-fonte da personalização
+        run: zip -qr LogHorizon-Voice-Web-v3-Source.zip voice-web
+
+      - name: Publicar artefatos
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizon-Voice-Web-v3
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            Svg-Spigot-0.1.3-LogHorizon-v3.jar
+            Svg-Spigot-0.1.3-LogHorizon-v3.sha256
+            LogHorizon-Voice-Web-v3-Source.zip
