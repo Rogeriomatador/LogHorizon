@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feature/resourcepackmanager-lh2-3ddefault
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -223,7 +226,6 @@ import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
