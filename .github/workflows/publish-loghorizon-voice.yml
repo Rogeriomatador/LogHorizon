@@ -33,6 +33,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Preparar APK oficial
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s downloads/app-release.apk
+          cp downloads/app-release.apk downloads/LogHorizonVoice-latest.apk
+
       - name: Validar APK oficial
         shell: bash
         run: |
@@ -113,7 +121,7 @@ jobs:
           }
 
           test "$NEW_CERT" = "$OLD_CERT" || {
-            echo "A assinatura da 0.5.1 não corresponde à última versão pública assinada."
+            echo "A assinatura da 0.5.1 renovada não corresponde à última versão pública assinada."
             echo "Commit anterior assinado: $OLD_COMMIT"
             echo "Anterior: $OLD_CERT"
             echo "Nova:     $NEW_CERT"
@@ -141,20 +149,28 @@ jobs:
           version_code = int(os.environ["APK_VERSION_CODE"])
           version_name = os.environ["APK_VERSION_NAME"]
           sha256 = os.environ["APK_SHA256"]
+          reinstall_notice = (
+              "Edição Mobile Renovada. Quem já instalou a versão 0.5.1 anterior deve "
+              "desinstalá-la e instalar novamente pelo site oficial."
+          )
 
           manifest_path = Path("app-update.json")
           manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
           manifest.update({
-              "enabled": True,
-              "versionCode": version_code,
-              "versionName": version_name,
-              "apkUrl": "https://rogeriomatador.github.io/LogHorizon/downloads/LogHorizonVoice-latest.apk",
-              "sha256": sha256,
-              "mandatory": False,
-              "releaseNotes": (
-                  "Novo HUD flutuante compacto e arrastável sobre o Minecraft, painel expansível com controles de voz, "
-                  "indicadores de conexão e microfone em tempo real, migração da bolha anterior e melhorias de estabilidade."
-              ),
+            "enabled": True,
+            "versionCode": version_code,
+            "versionName": version_name,
+            "apkUrl": "https://rogeriomatador.github.io/LogHorizon/downloads/LogHorizonVoice-latest.apk",
+            "sha256": sha256,
+            "mandatory": False,
+            "releaseNotes": (
+                "Edição Mobile Renovada: novo painel único com navegação em Início, Áudio e Mais; "
+                "ação de conexão sempre acessível; status e medidor do microfone em destaque; "
+                "controles rápidos, HUD e configurações de áudio reorganizados; diagnóstico, "
+                "preparação do aparelho, privacidade e servidor avançado em uma interface mais moderna. "
+                "Como esta revisão mantém o versionCode 8, usuários da 0.5.1 anterior precisam "
+                "desinstalar e instalar novamente pelo site oficial."
+            ),
           })
           manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
@@ -163,38 +179,51 @@ jobs:
           script = re.sub(r'apkVersion:\s*"[^"]+"', f'apkVersion: "{version_name}"', script, count=1)
           script = re.sub(r'nextApkVersion:\s*"[^"]+"', f'nextApkVersion: "{version_name}"', script, count=1)
           script = re.sub(r'releaseReady:\s*(?:true|false)', 'releaseReady: true', script, count=1)
+          script = re.sub(
+              r'if \(note\) note\.textContent = "[^"]*";',
+              f'if (note) note.textContent = "{reinstall_notice}";',
+              script,
+              count=1,
+          )
           script_path.write_text(script, encoding="utf-8")
 
           index_path = Path("index.html")
           index = index_path.read_text(encoding="utf-8")
           index = re.sub(
               r'<span class="download-version">.*?</span>',
-              f'<span class="download-version">Android • Versão {version_name}</span>',
+              f'<span class="download-version">Android • Versão {version_name} • Mobile renovado</span>',
               index,
               count=1,
           )
           index = re.sub(
               r'<button class="button button-primary download-button" type="button" title="[^"]*">\s*.*?\s*</button>',
-              f'<button class="button button-primary download-button" type="button" title="Baixar Log Horizon Voice {version_name}">\n              BAIXAR V{version_name}\n            </button>',
+              f'<button class="button button-primary download-button" type="button" title="Baixar Log Horizon Voice {version_name} — Mobile Renovado">\n              BAIXAR V{version_name}\n            </button>',
               index,
               count=1,
               flags=re.S,
           )
-          index = re.sub(r'script\.js\?v=[^"]+', 'script.js?v=20260729-4', index, count=1)
+          index = re.sub(
+              r'<p class="download-note">.*?</p>',
+              f'<p class="download-note">{reinstall_notice}</p>',
+              index,
+              count=1,
+              flags=re.S,
+          )
+          index = re.sub(r'script\.js\?v=[^"]+', 'script.js?v=20260730-mobile-renovado', index, count=1)
           index_path.write_text(index, encoding="utf-8")
           PY
 
-      - name: Publicar metadados validados
+      - name: Publicar APK e metadados validados
         if: github.event_name == 'push'
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app-update.json script.js index.html
+          git add downloads/LogHorizonVoice-latest.apk app-update.json script.js index.html
           if git diff --cached --quiet; then
-            echo "O site e o manifesto já estavam atualizados."
+            echo "O APK, o site e o manifesto já estavam atualizados."
             exit 0
           fi
-          git commit -m "Publicar Log Horizon Voice 0.5.1"
+          git commit -m "Publicar Log Horizon Voice 0.5.1 Mobile Renovado"
           git push
