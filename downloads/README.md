@@ -1,11 +1,20 @@
 # Downloads oficiais
 
-Envie nesta pasta somente versões **release assinadas** do Log Horizon Voice.
+Esta pasta contém somente versões **release assinadas** do Log Horizon Voice.
 
-Nome esperado pelo site:
+## Versão pública atual
 
-`LogHorizonVoice-latest.apk`
+**Log Horizon Voice 0.5.1 — Edição Mobile Renovada**
 
-A versão pública atual é **0.5.0**.
+- `versionCode`: `8`
+- pacote: `com.loghorizon.voice`
+- SHA-256: `d77e7dac3fbc32346508454c6517ce737db99388a76fed967af9e91fb37dee47`
 
-Não publique o arquivo `.jks`, senhas, chaves privadas ou builds de debug.
+Arquivos oficiais:
+
+- `LogHorizonVoice-latest.apk` — arquivo utilizado pelo site e pelo manifesto de atualização;
+- `app-release.apk` — cópia da release enviada para validação e publicação.
+
+Os dois APKs devem ser idênticos. Como esta revisão mantém o mesmo `versionCode` da primeira edição 0.5.1, usuários que já tinham a versão anterior precisam desinstalá-la e instalar novamente pelo site oficial.
+
+Nunca publique o arquivo `.jks`, `keystore.properties`, senhas, chaves privadas, builds debug ou APKs sem assinatura.
