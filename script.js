@@ -7,7 +7,7 @@ const CONFIG = {
   apkVersion: "0.5.1",
   nextApkVersion: "0.5.1",
   releaseReady: true,
-  voiceWebUrl: "http://enx-cirion-84.enx.host:10057/loghorizon.html",
+  voiceWebUrl: "http://enx-cirion-84.enx.host:10057/loghorizon.html?v=4.0.0",
   voiceTutorialUrl: "voz-pc.html"
 };
 
