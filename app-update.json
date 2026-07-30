@@ -3,7 +3,7 @@
   "versionCode": 8,
   "versionName": "0.5.1",
   "apkUrl": "https://rogeriomatador.github.io/LogHorizon/downloads/LogHorizonVoice-latest.apk",
-  "sha256": "44112a4bf7bc9565af63e19477236b2c4038fc94e07c4325fc6178ca2c82ee94",
+  "sha256": "d77e7dac3fbc32346508454c6517ce737db99388a76fed967af9e91fb37dee47",
   "mandatory": false,
-  "releaseNotes": "Novo HUD flutuante compacto e arrastável sobre o Minecraft, painel expansível com controles de voz, indicadores de conexão e microfone em tempo real, migração da bolha anterior e melhorias de estabilidade."
+  "releaseNotes": "Edição Mobile Renovada: novo painel único com navegação em Início, Áudio e Mais; ação de conexão sempre acessível; status e medidor do microfone em destaque; controles rápidos, HUD e configurações de áudio reorganizados; diagnóstico, preparação do aparelho, privacidade e servidor avançado em uma interface mais moderna. Como esta revisão mantém o versionCode 8, usuários da 0.5.1 anterior precisam desinstalar e instalar novamente pelo site oficial."
 }

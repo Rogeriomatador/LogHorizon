@@ -45,7 +45,7 @@ async function configureDownload() {
     downloadButton.textContent = `BAIXAR V${CONFIG.apkVersion}`;
     downloadButton.title = "Baixar Log Horizon Voice";
     if (version) version.textContent = `Android • Versão ${CONFIG.apkVersion}`;
-    if (note) note.textContent = "Download oficial da versão release assinada para Android.";
+    if (note) note.textContent = "Edição Mobile Renovada. Quem já instalou a versão 0.5.1 anterior deve desinstalá-la e instalar novamente pelo site oficial.";
 
     downloadButton.addEventListener("click", () => {
       const anchor = document.createElement("a");
