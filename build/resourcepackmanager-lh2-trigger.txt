@@ -1,0 +1,3 @@
+ResourcePackManager 2.3.0-LH2
+Prioridade visual: 3D Default acima do p1kl.
+Fallback de texturas vanilla para modelos 3D no Bedrock.
