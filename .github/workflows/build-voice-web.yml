@@ -1,0 +1,108 @@
+name: Build Log Horizon Voice Web V4
+
+on:
+  push:
+    branches:
+      - feature/voice-web-desktop-v3
+    paths:
+      - "voice-web-v4-source.part*.b64"
+      - ".github/workflows/build-voice-web.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "voice-web-v4-source.part*.b64"
+      - ".github/workflows/build-voice-web.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.4.1"
+
+      - name: Restaurar código-fonte V4
+        run: |
+          set -euo pipefail
+          cat voice-web-v4-source.part*.b64 | base64 --decode > voice-web-v4-source.tar.gz
+          echo "00405b299a57d46ab096c3bd9baa0545c943c09347ec3e660154a462874d5a51  voice-web-v4-source.tar.gz" | sha256sum --check
+          mkdir -p voice-web-v4
+          tar -xzf voice-web-v4-source.tar.gz -C voice-web-v4
+          test -s voice-web-v4/voice-web/loghorizon.html
+          test -s voice-web-v4/voice-web/css/loghorizon-v4.css
+          test -s voice-web-v4/voice-web/js/loghorizon-v4.js
+          test -s voice-web-v4/overlay/core/src/main/java/io/github/theodoremeyer/simplevoicegeyser/core/server/packets/PresencePacket.java
+
+      - name: Validar interface e JavaScript
+        run: |
+          set -euo pipefail
+          python3 voice-web-v4/voice-web/validate_voice_web.py
+          node --check voice-web-v4/voice-web/js/loghorizon-v4.js
+          node --check voice-web-v4/overlay/core/web/js/websocket.js
+          node --check voice-web-v4/overlay/core/web/js/audio/audio.js
+          node --check voice-web-v4/overlay/core/web/js/audio/microphone.js
+          node --check voice-web-v4/overlay/core/web/js/utils/logger.js
+
+      - name: Baixar código oficial SimpleVoice-Geyser 0.1.3
+        run: |
+          set -euo pipefail
+          git clone --filter=blob:none https://github.com/TheodoreMeyer/SimpleVoice-Geyser.git upstream
+          git -C upstream checkout f5b91f7ec670ffc0be0e4d5d4176d14f5c738553
+          test "$(git -C upstream rev-parse --short HEAD)" = "f5b91f7"
+
+      - name: Aplicar Log Horizon Voice Web V4
+        run: |
+          set -euo pipefail
+          cp -a voice-web-v4/overlay/. upstream/
+          cp voice-web-v4/voice-web/loghorizon.html upstream/core/web/loghorizon.html
+          cp voice-web-v4/voice-web/css/loghorizon-v4.css upstream/core/web/css/loghorizon-v4.css
+          cp voice-web-v4/voice-web/js/loghorizon-v4.js upstream/core/web/js/loghorizon-v4.js
+
+      - name: Compilar plugin completo
+        working-directory: upstream
+        run: gradle :spigot:shadowJar --no-daemon --stacktrace
+
+      - name: Preparar e validar JAR final
+        run: |
+          set -euo pipefail
+          ORIGINAL_JAR="$(find upstream/spigot/build/libs -maxdepth 1 -type f -name 'Svg-Spigot-*.jar' | head -n 1)"
+          test -n "$ORIGINAL_JAR"
+          cp "$ORIGINAL_JAR" Svg-Spigot-0.1.3-LogHorizon-v4.jar
+          unzip -tq Svg-Spigot-0.1.3-LogHorizon-v4.jar
+          unzip -p Svg-Spigot-0.1.3-LogHorizon-v4.jar web/loghorizon.html | grep -F 'window.BUILD_ID = "f5b91f7"'
+          unzip -p Svg-Spigot-0.1.3-LogHorizon-v4.jar web/loghorizon.html | grep -F 'loghorizon-v4.js'
+          unzip -p Svg-Spigot-0.1.3-LogHorizon-v4.jar web/js/websocket.js | grep -F 'AUTHENTICATED'
+          unzip -l Svg-Spigot-0.1.3-LogHorizon-v4.jar | grep -F 'PresencePacket.class'
+          unzip -l Svg-Spigot-0.1.3-LogHorizon-v4.jar | grep -F 'PingPacket.class'
+          sha256sum Svg-Spigot-0.1.3-LogHorizon-v4.jar | tee Svg-Spigot-0.1.3-LogHorizon-v4.sha256
+
+      - name: Empacotar código-fonte da personalização
+        run: zip -qr LogHorizon-Voice-Web-v4-Source.zip voice-web-v4
+
+      - name: Publicar artefatos
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizon-Voice-Web-v4
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            Svg-Spigot-0.1.3-LogHorizon-v4.jar
+            Svg-Spigot-0.1.3-LogHorizon-v4.sha256
+            LogHorizon-Voice-Web-v4-Source.zip
