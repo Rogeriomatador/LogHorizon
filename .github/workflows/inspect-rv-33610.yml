@@ -1,0 +1,23 @@
+name: Build GardenPlus RV 1.1.0 (Queryable)
+
+on:
+  push:
+    branches:
+      - inspect-rv-33610-20260726
+    paths:
+      - '.github/workflows/inspect-rv-33610.yml'
+      - '.github/workflows/build-gardenplus-rv.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/inspect-rv-33610.yml'
+      - '.github/workflows/build-gardenplus-rv.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-gardenplus-rv.yml

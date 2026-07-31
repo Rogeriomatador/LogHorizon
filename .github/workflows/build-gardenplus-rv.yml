@@ -1,0 +1,389 @@
+name: Build GardenPlus RV 1.1.0
+
+on:
+  workflow_call:
+  push:
+    branches:
+      - inspect-rv-33610-20260726
+    paths:
+      - '.github/workflows/build-gardenplus-rv.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/build-gardenplus-rv.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout temporary branch
+        uses: actions/checkout@v4
+
+      - name: Restore the validated GardenPlus 1.0.0 source
+        run: |
+          git fetch origin refs/pull/1/head:refs/remotes/origin/gardenplus-v1
+          git checkout refs/remotes/origin/gardenplus-v1 -- gardenplus
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Download exact plugin dependencies
+        shell: python
+        run: |
+          import json
+          import pathlib
+          import urllib.request
+
+          def download_version(api_url, target, wanted_version=None):
+              request = urllib.request.Request(api_url, headers={'User-Agent': 'LogHorizonGardenPlus/1.1.0'})
+              with urllib.request.urlopen(request) as response:
+                  payload = json.load(response)
+              if isinstance(payload, list):
+                  selected = next((v for v in payload if v.get('version_number') == wanted_version), None)
+              else:
+                  selected = payload
+              if selected is None:
+                  raise SystemExit(f'Version not found: {wanted_version}')
+              files = selected.get('files', [])
+              selected_file = next((f for f in files if f.get('primary')), files[0] if files else None)
+              if selected_file is None:
+                  raise SystemExit('No downloadable file found')
+              target.parent.mkdir(parents=True, exist_ok=True)
+              urllib.request.urlretrieve(selected_file['url'], target)
+              print(f'Downloaded {selected_file.get("filename")} -> {target} ({target.stat().st_size} bytes)')
+
+          download_version(
+              'https://api.modrinth.com/v2/project/ePND7F16/version',
+              pathlib.Path('gardenplus/lib/Garden-2.0.1.jar'),
+              '2.0.1'
+          )
+          download_version(
+              'https://api.modrinth.com/v2/version/qvzNMiDr',
+              pathlib.Path('gardenplus/lib/RealisticVillagers-3.3.6.10.jar')
+          )
+
+      - name: Add RealisticVillagers gift integration
+        shell: python
+        run: |
+          from pathlib import Path
+
+          pom = Path('gardenplus/pom.xml')
+          text = pom.read_text(encoding='utf-8')
+          text = text.replace('<version>1.0.0</version>', '<version>1.1.0</version>', 1)
+          marker = '    </dependencies>'
+          dependency = '''        <dependency>
+              <groupId>me.matsubara</groupId>
+              <artifactId>realisticvillagers</artifactId>
+              <version>3.3.6.10</version>
+              <scope>system</scope>
+              <systemPath>${project.basedir}/lib/RealisticVillagers-3.3.6.10.jar</systemPath>
+          </dependency>
+'''
+          if marker not in text:
+              raise SystemExit('Maven dependencies marker was not found')
+          text = text.replace(marker, dependency + marker, 1)
+          pom.write_text(text, encoding='utf-8')
+
+          plugin_yml = Path('gardenplus/src/main/resources/plugin.yml')
+          text = plugin_yml.read_text(encoding='utf-8')
+          text = text.replace('version: 1.0.0', 'version: 1.1.0', 1)
+          text = text.replace('description: Integra Garden 2.0.1 ao AuraSkills com raridades, qualidades e plantas especiais.',
+                              'description: Integra Garden, AuraSkills e RealisticVillagers com raridades, qualidades, plantas especiais e presentes.')
+          text = text.replace('  - AuraSkills\n', '  - AuraSkills\n  - RealisticVillagers\n', 1)
+          plugin_yml.write_text(text, encoding='utf-8')
+
+          main = Path('gardenplus/src/main/java/br/com/loghorizon/gardenplus/LogHorizonGardenPlus.java')
+          text = main.read_text(encoding='utf-8')
+          anchor = '        Bukkit.getPluginManager().registerEvents(this, this);\n'
+          addition = '''        Bukkit.getPluginManager().registerEvents(this, this);
+
+          org.bukkit.plugin.Plugin rvPlugin = Bukkit.getPluginManager().getPlugin("RealisticVillagers");
+          if (rvPlugin instanceof me.matsubara.realisticvillagers.RealisticVillagers realisticVillagers
+                  && realisticVillagers.isEnabled()) {
+              Bukkit.getPluginManager().registerEvents(
+                      new RealisticVillagersGiftIntegration(this, realisticVillagers), this
+              );
+              getLogger().info("Integração de presentes ativa: RealisticVillagers 3.3.6.10.");
+          } else {
+              getLogger().severe("RealisticVillagers 3.3.6.10 não foi encontrado ou não está ativo.");
+              Bukkit.getPluginManager().disablePlugin(this);
+              return;
+          }
+'''
+          if anchor not in text:
+              raise SystemExit('Main listener registration anchor was not found')
+          text = text.replace(anchor, addition, 1)
+          text = text.replace('GardenPlus ativo: Garden 2.0.1 + AuraSkills 2.3.12.',
+                              'GardenPlus ativo: Garden 2.0.1 + AuraSkills 2.3.12 + RealisticVillagers 3.3.6.10.')
+          main.write_text(text, encoding='utf-8')
+
+          config = Path('gardenplus/src/main/resources/config.yml')
+          text = config.read_text(encoding='utf-8')
+          text += '''
+
+# Integração com RealisticVillagers 3.3.6.10.
+# Usa o limite diário e o cooldown definidos no gifts.yml do RealisticVillagers.
+realistic-villagers:
+  enabled: true
+  reputation:
+    normal-fruit: 2
+    quality-fruit: 4
+    perfect-fruit: 7
+    farmer-seeds: 3
+    other-seeds: 1
+    child-apple-strawberry-bonus: 1
+    partner-cherry-peach-bonus: 1
+  messages: true
+'''
+          config.write_text(text, encoding='utf-8')
+
+      - name: Create exact gift listener
+        run: |
+          cat > gardenplus/src/main/java/br/com/loghorizon/gardenplus/RealisticVillagersGiftIntegration.java <<'JAVA'
+          package br.com.loghorizon.gardenplus;
+
+          import dev.jsinco.brewery.garden.plant.PlantType;
+          import dev.jsinco.brewery.garden.plant.item.PlantItem;
+          import me.matsubara.realisticvillagers.RealisticVillagers;
+          import me.matsubara.realisticvillagers.entity.IVillagerNPC;
+          import me.matsubara.realisticvillagers.event.VillagerPickGiftEvent;
+          import me.matsubara.realisticvillagers.manager.ExpectingManager;
+          import me.matsubara.realisticvillagers.manager.gift.GiftCategory;
+          import org.bukkit.Bukkit;
+          import org.bukkit.EntityEffect;
+          import org.bukkit.NamespacedKey;
+          import org.bukkit.entity.Item;
+          import org.bukkit.entity.LivingEntity;
+          import org.bukkit.entity.Player;
+          import org.bukkit.entity.Villager;
+          import org.bukkit.event.EventHandler;
+          import org.bukkit.event.EventPriority;
+          import org.bukkit.event.Listener;
+          import org.bukkit.event.entity.EntityPickupItemEvent;
+          import org.bukkit.inventory.ItemStack;
+          import org.bukkit.persistence.PersistentDataType;
+
+          import java.util.Locale;
+          import java.util.Set;
+          import java.util.UUID;
+
+          /**
+           * Integra exclusivamente frutas e sementes reais do GardenPlus ao fluxo de
+           * presentes por DROP do RealisticVillagers 3.3.6.10.
+           */
+          final class RealisticVillagersGiftIntegration implements Listener {
+
+              private static final Set<String> CHILD_FAVORITES = Set.of("apple", "strawberry");
+              private static final Set<String> PARTNER_FAVORITES = Set.of("cherry", "peach");
+
+              private final LogHorizonGardenPlus plugin;
+              private final RealisticVillagers realisticVillagers;
+              private final NamespacedKey qualityKey;
+
+              RealisticVillagersGiftIntegration(
+                      LogHorizonGardenPlus plugin,
+                      RealisticVillagers realisticVillagers
+              ) {
+                  this.plugin = plugin;
+                  this.realisticVillagers = realisticVillagers;
+                  this.qualityKey = new NamespacedKey(plugin, "fruit_quality");
+              }
+
+              @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+              public void onGardenGiftPickup(EntityPickupItemEvent event) {
+                  if (!plugin.getConfig().getBoolean("realistic-villagers.enabled", true)) {
+                      return;
+                  }
+
+                  Item itemEntity = event.getItem();
+                  ItemStack stack = itemEntity.getItemStack();
+                  boolean fruit = PlantItem.isFruit(stack);
+                  boolean seeds = PlantItem.isSeeds(stack);
+                  if (!fruit && !seeds) {
+                      return;
+                  }
+
+                  UUID thrower = itemEntity.getThrower();
+                  if (thrower == null) {
+                      return;
+                  }
+
+                  Player player = Bukkit.getPlayer(thrower);
+                  if (player == null || !player.isOnline()) {
+                      return;
+                  }
+
+                  ExpectingManager expectingManager = realisticVillagers.getExpectingManager();
+                  IVillagerNPC npc = expectingManager.get(thrower);
+                  if (npc == null || !npc.isExpectingGift()) {
+                      return;
+                  }
+
+                  LivingEntity picker = event.getEntity();
+                  LivingEntity villagerEntity = npc.bukkit();
+                  if (villagerEntity == null
+                          || !villagerEntity.getUniqueId().equals(picker.getUniqueId())) {
+                      return;
+                  }
+
+                  PlantType type = PlantItem.plantType(stack);
+                  if (type == null) {
+                      return;
+                  }
+                  String species = normalizeSpecies(type);
+
+                  int rawReputation = calculateReputation(npc, player, villagerEntity, stack, species, fruit, seeds);
+
+                  expectingManager.remove(thrower);
+                  npc.setGiftDropped(false);
+                  npc.stopExpecting();
+                  event.setCancelled(true);
+
+                  ItemStack giftedOne = stack.clone();
+                  giftedOne.setAmount(1);
+                  consumeOne(itemEntity, stack);
+
+                  Bukkit.getPluginManager().callEvent(
+                          new VillagerPickGiftEvent(npc, player, giftedOne)
+                  );
+
+                  int applied = realisticVillagers.getGiftManager().applyDailyCap(
+                          villagerEntity.getUniqueId(), player.getUniqueId(), rawReputation
+                  );
+                  if (applied > 0) {
+                      npc.addMinorPositive(player, applied);
+                  } else if (applied < 0) {
+                      npc.addMinorNegative(player, -applied);
+                  }
+
+                  GiftCategory category = rawReputation >= 4
+                          ? GiftCategory.LOVED
+                          : GiftCategory.NEUTRAL;
+                  villagerEntity.playEffect(category == GiftCategory.LOVED
+                          ? EntityEffect.VILLAGER_HEART
+                          : EntityEffect.VILLAGER_HAPPY);
+
+                  if (plugin.getConfig().getBoolean("realistic-villagers.messages", true)) {
+                      realisticVillagers.getMessages().sendRandomGiftMessage(player, npc, category);
+                  }
+
+                  realisticVillagers.getCooldownManager().addCooldown(
+                          player, villagerEntity, "gift"
+                  );
+              }
+
+              private int calculateReputation(
+                      IVillagerNPC npc,
+                      Player player,
+                      LivingEntity villagerEntity,
+                      ItemStack stack,
+                      String species,
+                      boolean fruit,
+                      boolean seeds
+              ) {
+                  int reputation;
+                  if (seeds) {
+                      reputation = npc.is(Villager.Profession.FARMER)
+                              ? configInt("farmer-seeds", 3)
+                              : configInt("other-seeds", 1);
+                  } else if (fruit) {
+                      String quality = stack.getPersistentDataContainer().get(
+                              qualityKey, PersistentDataType.STRING
+                      );
+                      reputation = switch (quality == null
+                              ? "normal"
+                              : quality.toLowerCase(Locale.ROOT)) {
+                          case "perfect" -> configInt("perfect-fruit", 7);
+                          case "quality" -> configInt("quality-fruit", 4);
+                          default -> configInt("normal-fruit", 2);
+                      };
+                  } else {
+                      return 0;
+                  }
+
+                  if (villagerEntity instanceof Villager villager
+                          && !villager.isAdult()
+                          && CHILD_FAVORITES.contains(species)) {
+                      reputation += configInt("child-apple-strawberry-bonus", 1);
+                  }
+
+                  if (npc.isPartner(player) && PARTNER_FAVORITES.contains(species)) {
+                      reputation += configInt("partner-cherry-peach-bonus", 1);
+                  }
+
+                  return Math.max(0, reputation);
+              }
+
+              private int configInt(String key, int fallback) {
+                  return plugin.getConfig().getInt(
+                          "realistic-villagers.reputation." + key, fallback
+                  );
+              }
+
+              private static String normalizeSpecies(PlantType type) {
+                  return type.getKey().getKey().toLowerCase(Locale.ROOT);
+              }
+
+              private static void consumeOne(Item itemEntity, ItemStack original) {
+                  if (original.getAmount() <= 1) {
+                      itemEntity.remove();
+                      return;
+                  }
+                  ItemStack remaining = original.clone();
+                  remaining.setAmount(original.getAmount() - 1);
+                  itemEntity.setItemStack(remaining);
+              }
+          }
+          JAVA
+
+      - name: Build updated plugin
+        run: mvn -B -f gardenplus/pom.xml clean package
+
+      - name: Verify compiled artifact
+        run: |
+          test -s gardenplus/target/LogHorizonGardenPlus.jar
+          jar tf gardenplus/target/LogHorizonGardenPlus.jar | grep -F 'br/com/loghorizon/gardenplus/RealisticVillagersGiftIntegration.class'
+          unzip -p gardenplus/target/LogHorizonGardenPlus.jar plugin.yml | tee /tmp/plugin.yml
+          grep -F 'version: 1.1.0' /tmp/plugin.yml
+          grep -F 'RealisticVillagers' /tmp/plugin.yml
+          javap -classpath gardenplus/target/LogHorizonGardenPlus.jar:gardenplus/lib/RealisticVillagers-3.3.6.10.jar:gardenplus/lib/Garden-2.0.1.jar \
+            br.com.loghorizon.gardenplus.RealisticVillagersGiftIntegration
+
+      - name: Prepare separate upload package
+        run: |
+          mkdir -p gardenplus/dist
+          cp gardenplus/target/LogHorizonGardenPlus.jar gardenplus/dist/
+          sha256sum gardenplus/dist/LogHorizonGardenPlus.jar > gardenplus/dist/SHA256.txt
+          cat > gardenplus/dist/INSTALACAO.txt <<'TXT'
+          Log Horizon - GardenPlus 1.1.0
+
+          1. Desligue completamente o servidor.
+          2. Apague apenas o JAR antigo plugins/LogHorizonGardenPlus.jar.
+          3. Envie o novo LogHorizonGardenPlus.jar diretamente para plugins/.
+          4. Não apague plugins/LogHorizonGardenPlus/plants.yml.
+          5. Não substitua o gifts.yml do RealisticVillagers.
+          6. Inicie o servidor normalmente; não use /reload.
+
+          Dependências exatas:
+          - Garden 2.0.1
+          - AuraSkills 2.3.12
+          - RealisticVillagers 3.3.6.10
+
+          A integração de frutas personalizadas funciona no modo de presente DROP do RealisticVillagers.
+          TXT
+
+      - name: Upload final JAR package
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizonGardenPlus-RV-1.1.0
+          path: gardenplus/dist/
+          if-no-files-found: error
