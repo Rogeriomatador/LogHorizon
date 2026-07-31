@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - .github/workflows/build-loghorizon-any-enchant.yml
+  pull_request:
+    branches: [main]
+    paths:
+      - plugins/LogHorizonAnyEnchant/**
   workflow_dispatch:
 
 permissions:
@@ -41,8 +45,18 @@ jobs:
           jar tf build-artifacts/LogHorizonAnyEnchant-1.0.0-LH1.jar | grep -q 'com/loghorizon/anyenchant/LogHorizonAnyEnchant.class'
           unzip -p build-artifacts/LogHorizonAnyEnchant-1.0.0-LH1.jar plugin.yml | grep -q 'api-version: .26.2.'
 
+      - name: Upload plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizonAnyEnchant-1.0.0-LH1
+          path: |
+            plugins/LogHorizonAnyEnchant/build-artifacts/LogHorizonAnyEnchant-1.0.0-LH1.jar
+            plugins/LogHorizonAnyEnchant/build-artifacts/LogHorizonAnyEnchant-1.0.0-LH1.sha256
+            plugins/LogHorizonAnyEnchant/build-artifacts/maven-build.log
+          if-no-files-found: error
+
       - name: Publish build result to feature branch
-        if: always()
+        if: github.event_name != 'pull_request'
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
