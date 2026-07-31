@@ -1,0 +1,41 @@
+name: Build Garden Bedrock Fix
+
+on:
+  pull_request:
+    paths:
+      - 'garden-bedrock-fix/**'
+      - '.github/workflows/build-garden-bedrock-fix.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Gerar pacote-base
+        run: python garden-bedrock-fix/build.py
+
+      - name: Aplicar correção vertical do FIX3
+        run: python garden-bedrock-fix/patch_fix3.py
+
+      - name: Listar conteúdo do ZIP
+        run: unzip -l dist/LogHorizon-Garden-Bedrock-FIX3.zip
+
+      - name: Validar mapeamento final
+        run: unzip -p dist/LogHorizon-Garden-Bedrock-FIX3.zip garden_fruits.yml | grep -c 'translation: \[0.0, -0.45, 0.0\]' | grep '^2$'
+
+      - name: Enviar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizon-Garden-Bedrock-FIX3
+          path: dist/LogHorizon-Garden-Bedrock-FIX3.zip
+          if-no-files-found: error
