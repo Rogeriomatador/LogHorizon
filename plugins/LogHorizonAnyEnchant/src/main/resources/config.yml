@@ -1,0 +1,22 @@
+# Intervalo de atualização dos encantamentos espelhados.
+refresh-ticks: 5
+
+# Limita sempre ao nível máximo vanilla informado pelo Paper/Minecraft.
+clamp-to-vanilla-max: true
+
+# Fontes consideradas: mão principal, mão secundária e quatro peças de armadura.
+include-main-hand: true
+include-off-hand: true
+include-armor: true
+
+# Encantamentos que não devem ser propagados globalmente.
+# Maldições ficam fora para que uma única peça amaldiçoada não afete todo o equipamento.
+ignored-enchantments:
+  - binding_curse
+  - vanishing_curse
+
+# Mending e Unbreaking podem ser propagados para todos os itens equipados compatíveis.
+propagate-durability-enchantments: true
+
+# Mostra no console somente mudanças importantes; não imprime atualização a cada ciclo.
+debug: false

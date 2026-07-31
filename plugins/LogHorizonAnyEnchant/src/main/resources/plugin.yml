@@ -1,0 +1,16 @@
+name: LogHorizonAnyEnchant
+version: 1.0.0-LH1
+main: com.loghorizon.anyenchant.LogHorizonAnyEnchant
+api-version: '26.2'
+author: Log Horizon
+description: Faz encantamentos vanilla equipados funcionarem no item/slot compatível, usando o maior nível encontrado.
+softdepend: [UberEnchant]
+commands:
+  lhae:
+    description: Diagnóstico e manutenção do LogHorizonAnyEnchant
+    usage: /lhae <status|refresh|cleanup>
+    permission: loghorizon.anyenchant.admin
+permissions:
+  loghorizon.anyenchant.admin:
+    description: Administração do LogHorizonAnyEnchant
+    default: op
