@@ -1,0 +1,813 @@
+Classfile jar:file:///home/runner/work/LogHorizon/LogHorizon/plugins/LogHorizonStellarityB53AltarCarrierShim/build-artifacts/LogHorizonStellarityB53AltarCarrierShim-0.1.0-B5.3-TEST.jar!/com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.class
+  Last modified Sep 11, 2026; size 10528 bytes
+  SHA-256 checksum 83ce7b7c435e54c3b4a61499498f7715795afd4917c411042695fd9abde242c7
+  Compiled from "LogHorizonStellarityB53AltarCarrierShim.java"
+public final class com.loghorizon.stellarity.b53altarfallback.LogHorizonStellarityB53AltarCarrierShim extends org.bukkit.plugin.java.JavaPlugin implements org.bukkit.event.Listener
+  minor version: 0
+  major version: 69
+  flags: (0x0031) ACC_PUBLIC, ACC_FINAL, ACC_SUPER
+  this_class: #11                         // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim
+  super_class: #2                         // org/bukkit/plugin/java/JavaPlugin
+  interfaces: 1, fields: 5, methods: 15, attributes: 3
+Constant pool:
+    #1 = Methodref          #2.#3         // org/bukkit/plugin/java/JavaPlugin."<init>":()V
+    #2 = Class              #4            // org/bukkit/plugin/java/JavaPlugin
+    #3 = NameAndType        #5:#6         // "<init>":()V
+    #4 = Utf8               org/bukkit/plugin/java/JavaPlugin
+    #5 = Utf8               <init>
+    #6 = Utf8               ()V
+    #7 = Class              #8            // java/util/HashMap
+    #8 = Utf8               java/util/HashMap
+    #9 = Methodref          #7.#3         // java/util/HashMap."<init>":()V
+   #10 = Fieldref           #11.#12       // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.altarCacheUntil:Ljava/util/Map;
+   #11 = Class              #13           // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim
+   #12 = NameAndType        #14:#15       // altarCacheUntil:Ljava/util/Map;
+   #13 = Utf8               com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim
+   #14 = Utf8               altarCacheUntil
+   #15 = Utf8               Ljava/util/Map;
+   #16 = Fieldref           #11.#17       // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.handledLocationsUntil:Ljava/util/Map;
+   #17 = NameAndType        #18:#15       // handledLocationsUntil:Ljava/util/Map;
+   #18 = Utf8               handledLocationsUntil
+   #19 = Methodref          #11.#20       // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.getServer:()Lorg/bukkit/Server;
+   #20 = NameAndType        #21:#22       // getServer:()Lorg/bukkit/Server;
+   #21 = Utf8               getServer
+   #22 = Utf8               ()Lorg/bukkit/Server;
+   #23 = InterfaceMethodref #24.#25       // org/bukkit/Server.getPluginManager:()Lorg/bukkit/plugin/PluginManager;
+   #24 = Class              #26           // org/bukkit/Server
+   #25 = NameAndType        #27:#28       // getPluginManager:()Lorg/bukkit/plugin/PluginManager;
+   #26 = Utf8               org/bukkit/Server
+   #27 = Utf8               getPluginManager
+   #28 = Utf8               ()Lorg/bukkit/plugin/PluginManager;
+   #29 = InterfaceMethodref #30.#31       // org/bukkit/plugin/PluginManager.registerEvents:(Lorg/bukkit/event/Listener;Lorg/bukkit/plugin/Plugin;)V
+   #30 = Class              #32           // org/bukkit/plugin/PluginManager
+   #31 = NameAndType        #33:#34       // registerEvents:(Lorg/bukkit/event/Listener;Lorg/bukkit/plugin/Plugin;)V
+   #32 = Utf8               org/bukkit/plugin/PluginManager
+   #33 = Utf8               registerEvents
+   #34 = Utf8               (Lorg/bukkit/event/Listener;Lorg/bukkit/plugin/Plugin;)V
+   #35 = Methodref          #11.#36       // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.getLogger:()Ljava/util/logging/Logger;
+   #36 = NameAndType        #37:#38       // getLogger:()Ljava/util/logging/Logger;
+   #37 = Utf8               getLogger
+   #38 = Utf8               ()Ljava/util/logging/Logger;
+   #39 = String             #40           // B5.3 TEST shim ativo: CRYING_OBSIDIAN só será tratado como Altar com identidade Stellarity confirmada.
+   #40 = Utf8               B5.3 TEST shim ativo: CRYING_OBSIDIAN só será tratado como Altar com identidade Stellarity confirmada.
+   #41 = Methodref          #42.#43       // java/util/logging/Logger.info:(Ljava/lang/String;)V
+   #42 = Class              #44           // java/util/logging/Logger
+   #43 = NameAndType        #45:#46       // info:(Ljava/lang/String;)V
+   #44 = Utf8               java/util/logging/Logger
+   #45 = Utf8               info
+   #46 = Utf8               (Ljava/lang/String;)V
+   #47 = InterfaceMethodref #48.#49       // java/util/Map.clear:()V
+   #48 = Class              #50           // java/util/Map
+   #49 = NameAndType        #51:#6        // clear:()V
+   #50 = Utf8               java/util/Map
+   #51 = Utf8               clear
+   #52 = Methodref          #53.#54       // org/bukkit/event/player/PlayerInteractEvent.getAction:()Lorg/bukkit/event/block/Action;
+   #53 = Class              #55           // org/bukkit/event/player/PlayerInteractEvent
+   #54 = NameAndType        #56:#57       // getAction:()Lorg/bukkit/event/block/Action;
+   #55 = Utf8               org/bukkit/event/player/PlayerInteractEvent
+   #56 = Utf8               getAction
+   #57 = Utf8               ()Lorg/bukkit/event/block/Action;
+   #58 = Fieldref           #59.#60       // org/bukkit/event/block/Action.RIGHT_CLICK_BLOCK:Lorg/bukkit/event/block/Action;
+   #59 = Class              #61           // org/bukkit/event/block/Action
+   #60 = NameAndType        #62:#63       // RIGHT_CLICK_BLOCK:Lorg/bukkit/event/block/Action;
+   #61 = Utf8               org/bukkit/event/block/Action
+   #62 = Utf8               RIGHT_CLICK_BLOCK
+   #63 = Utf8               Lorg/bukkit/event/block/Action;
+   #64 = Fieldref           #59.#65       // org/bukkit/event/block/Action.RIGHT_CLICK_AIR:Lorg/bukkit/event/block/Action;
+   #65 = NameAndType        #66:#63       // RIGHT_CLICK_AIR:Lorg/bukkit/event/block/Action;
+   #66 = Utf8               RIGHT_CLICK_AIR
+   #67 = Methodref          #53.#68       // org/bukkit/event/player/PlayerInteractEvent.getItem:()Lorg/bukkit/inventory/ItemStack;
+   #68 = NameAndType        #69:#70       // getItem:()Lorg/bukkit/inventory/ItemStack;
+   #69 = Utf8               getItem
+   #70 = Utf8               ()Lorg/bukkit/inventory/ItemStack;
+   #71 = Methodref          #11.#72       // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.isAltarItem:(Lorg/bukkit/inventory/ItemStack;)Z
+   #72 = NameAndType        #73:#74       // isAltarItem:(Lorg/bukkit/inventory/ItemStack;)Z
+   #73 = Utf8               isAltarItem
+   #74 = Utf8               (Lorg/bukkit/inventory/ItemStack;)Z
+   #75 = Methodref          #53.#76       // org/bukkit/event/player/PlayerInteractEvent.getPlayer:()Lorg/bukkit/entity/Player;
+   #76 = NameAndType        #77:#78       // getPlayer:()Lorg/bukkit/entity/Player;
+   #77 = Utf8               getPlayer
+   #78 = Utf8               ()Lorg/bukkit/entity/Player;
+   #79 = Methodref          #11.#80       // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.rememberAltar:(Lorg/bukkit/entity/Player;)V
+   #80 = NameAndType        #81:#82       // rememberAltar:(Lorg/bukkit/entity/Player;)V
+   #81 = Utf8               rememberAltar
+   #82 = Utf8               (Lorg/bukkit/entity/Player;)V
+   #83 = Methodref          #84.#76       // org/bukkit/event/block/BlockPlaceEvent.getPlayer:()Lorg/bukkit/entity/Player;
+   #84 = Class              #85           // org/bukkit/event/block/BlockPlaceEvent
+   #85 = Utf8               org/bukkit/event/block/BlockPlaceEvent
+   #86 = Methodref          #84.#87       // org/bukkit/event/block/BlockPlaceEvent.getItemInHand:()Lorg/bukkit/inventory/ItemStack;
+   #87 = NameAndType        #88:#70       // getItemInHand:()Lorg/bukkit/inventory/ItemStack;
+   #88 = Utf8               getItemInHand
+   #89 = Methodref          #84.#90       // org/bukkit/event/block/BlockPlaceEvent.getBlockPlaced:()Lorg/bukkit/block/Block;
+   #90 = NameAndType        #91:#92       // getBlockPlaced:()Lorg/bukkit/block/Block;
+   #91 = Utf8               getBlockPlaced
+   #92 = Utf8               ()Lorg/bukkit/block/Block;
+   #93 = InterfaceMethodref #94.#95       // org/bukkit/block/Block.getType:()Lorg/bukkit/Material;
+   #94 = Class              #96           // org/bukkit/block/Block
+   #95 = NameAndType        #97:#98       // getType:()Lorg/bukkit/Material;
+   #96 = Utf8               org/bukkit/block/Block
+   #97 = Utf8               getType
+   #98 = Utf8               ()Lorg/bukkit/Material;
+   #99 = Fieldref           #100.#101     // org/bukkit/Material.CRYING_OBSIDIAN:Lorg/bukkit/Material;
+  #100 = Class              #102          // org/bukkit/Material
+  #101 = NameAndType        #103:#104     // CRYING_OBSIDIAN:Lorg/bukkit/Material;
+  #102 = Utf8               org/bukkit/Material
+  #103 = Utf8               CRYING_OBSIDIAN
+  #104 = Utf8               Lorg/bukkit/Material;
+  #105 = InterfaceMethodref #106.#107     // org/bukkit/entity/Player.getInventory:()Lorg/bukkit/inventory/PlayerInventory;
+  #106 = Class              #108          // org/bukkit/entity/Player
+  #107 = NameAndType        #109:#110     // getInventory:()Lorg/bukkit/inventory/PlayerInventory;
+  #108 = Utf8               org/bukkit/entity/Player
+  #109 = Utf8               getInventory
+  #110 = Utf8               ()Lorg/bukkit/inventory/PlayerInventory;
+  #111 = InterfaceMethodref #112.#113     // org/bukkit/inventory/PlayerInventory.getItemInMainHand:()Lorg/bukkit/inventory/ItemStack;
+  #112 = Class              #114          // org/bukkit/inventory/PlayerInventory
+  #113 = NameAndType        #115:#70      // getItemInMainHand:()Lorg/bukkit/inventory/ItemStack;
+  #114 = Utf8               org/bukkit/inventory/PlayerInventory
+  #115 = Utf8               getItemInMainHand
+  #116 = InterfaceMethodref #112.#117     // org/bukkit/inventory/PlayerInventory.getItemInOffHand:()Lorg/bukkit/inventory/ItemStack;
+  #117 = NameAndType        #118:#70      // getItemInOffHand:()Lorg/bukkit/inventory/ItemStack;
+  #118 = Utf8               getItemInOffHand
+  #119 = Methodref          #11.#120      // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.hasFreshAltarCache:(Lorg/bukkit/entity/Player;)Z
+  #120 = NameAndType        #121:#122     // hasFreshAltarCache:(Lorg/bukkit/entity/Player;)Z
+  #121 = Utf8               hasFreshAltarCache
+  #122 = Utf8               (Lorg/bukkit/entity/Player;)Z
+  #123 = InvokeDynamic      #0:#124       // #0:get:(Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;Lorg/bukkit/block/Block;Lorg/bukkit/entity/Player;)Ljava/util/function/Supplier;
+  #124 = NameAndType        #125:#126     // get:(Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;Lorg/bukkit/block/Block;Lorg/bukkit/entity/Player;)Ljava/util/function/Supplier;
+  #125 = Utf8               get
+  #126 = Utf8               (Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;Lorg/bukkit/block/Block;Lorg/bukkit/entity/Player;)Ljava/util/function/Supplier;
+  #127 = Methodref          #42.#128      // java/util/logging/Logger.fine:(Ljava/util/function/Supplier;)V
+  #128 = NameAndType        #129:#130     // fine:(Ljava/util/function/Supplier;)V
+  #129 = Utf8               fine
+  #130 = Utf8               (Ljava/util/function/Supplier;)V
+  #131 = Methodref          #11.#132      // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.locationKey:(Lorg/bukkit/block/Block;)Ljava/lang/String;
+  #132 = NameAndType        #133:#134     // locationKey:(Lorg/bukkit/block/Block;)Ljava/lang/String;
+  #133 = Utf8               locationKey
+  #134 = Utf8               (Lorg/bukkit/block/Block;)Ljava/lang/String;
+  #135 = Methodref          #136.#137     // java/lang/System.currentTimeMillis:()J
+  #136 = Class              #138          // java/lang/System
+  #137 = NameAndType        #139:#140     // currentTimeMillis:()J
+  #138 = Utf8               java/lang/System
+  #139 = Utf8               currentTimeMillis
+  #140 = Utf8               ()J
+  #141 = InterfaceMethodref #48.#142      // java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+  #142 = NameAndType        #125:#143     // get:(Ljava/lang/Object;)Ljava/lang/Object;
+  #143 = Utf8               (Ljava/lang/Object;)Ljava/lang/Object;
+  #144 = Class              #145          // java/lang/Long
+  #145 = Utf8               java/lang/Long
+  #146 = Methodref          #144.#147     // java/lang/Long.longValue:()J
+  #147 = NameAndType        #148:#140     // longValue:()J
+  #148 = Utf8               longValue
+  #149 = InvokeDynamic      #1:#150       // #1:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+  #150 = NameAndType        #151:#152     // makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+  #151 = Utf8               makeConcatWithConstants
+  #152 = Utf8               (Ljava/lang/String;)Ljava/lang/String;
+  #153 = Methodref          #42.#154      // java/util/logging/Logger.warning:(Ljava/lang/String;)V
+  #154 = NameAndType        #155:#46      // warning:(Ljava/lang/String;)V
+  #155 = Utf8               warning
+  #156 = Long               1200l
+  #158 = Methodref          #144.#159     // java/lang/Long.valueOf:(J)Ljava/lang/Long;
+  #159 = NameAndType        #160:#161     // valueOf:(J)Ljava/lang/Long;
+  #160 = Utf8               valueOf
+  #161 = Utf8               (J)Ljava/lang/Long;
+  #162 = InterfaceMethodref #48.#163      // java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  #163 = NameAndType        #164:#165     // put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  #164 = Utf8               put
+  #165 = Utf8               (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  #166 = InterfaceMethodref #106.#167     // org/bukkit/entity/Player.getName:()Ljava/lang/String;
+  #167 = NameAndType        #168:#169     // getName:()Ljava/lang/String;
+  #168 = Utf8               getName
+  #169 = Utf8               ()Ljava/lang/String;
+  #170 = Methodref          #11.#171      // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.describe:(Lorg/bukkit/block/Block;)Ljava/lang/String;
+  #171 = NameAndType        #172:#134     // describe:(Lorg/bukkit/block/Block;)Ljava/lang/String;
+  #172 = Utf8               describe
+  #173 = InvokeDynamic      #2:#174       // #2:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;ZZZZ)Ljava/lang/String;
+  #174 = NameAndType        #151:#175     // makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;ZZZZ)Ljava/lang/String;
+  #175 = Utf8               (Ljava/lang/String;Ljava/lang/String;ZZZZ)Ljava/lang/String;
+  #176 = Methodref          #177.#178     // org/bukkit/Bukkit.getScheduler:()Lorg/bukkit/scheduler/BukkitScheduler;
+  #177 = Class              #179          // org/bukkit/Bukkit
+  #178 = NameAndType        #180:#181     // getScheduler:()Lorg/bukkit/scheduler/BukkitScheduler;
+  #179 = Utf8               org/bukkit/Bukkit
+  #180 = Utf8               getScheduler
+  #181 = Utf8               ()Lorg/bukkit/scheduler/BukkitScheduler;
+  #182 = InvokeDynamic      #3:#183       // #3:run:(Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)Ljava/lang/Runnable;
+  #183 = NameAndType        #184:#185     // run:(Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)Ljava/lang/Runnable;
+  #184 = Utf8               run
+  #185 = Utf8               (Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)Ljava/lang/Runnable;
+  #186 = InterfaceMethodref #187.#188     // org/bukkit/scheduler/BukkitScheduler.runTask:(Lorg/bukkit/plugin/Plugin;Ljava/lang/Runnable;)Lorg/bukkit/scheduler/BukkitTask;
+  #187 = Class              #189          // org/bukkit/scheduler/BukkitScheduler
+  #188 = NameAndType        #190:#191     // runTask:(Lorg/bukkit/plugin/Plugin;Ljava/lang/Runnable;)Lorg/bukkit/scheduler/BukkitTask;
+  #189 = Utf8               org/bukkit/scheduler/BukkitScheduler
+  #190 = Utf8               runTask
+  #191 = Utf8               (Lorg/bukkit/plugin/Plugin;Ljava/lang/Runnable;)Lorg/bukkit/scheduler/BukkitTask;
+  #192 = Methodref          #193.#194     // java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+  #193 = Class              #195          // java/lang/String
+  #194 = NameAndType        #160:#196     // valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+  #195 = Utf8               java/lang/String
+  #196 = Utf8               (Ljava/lang/Object;)Ljava/lang/String;
+  #197 = InvokeDynamic      #4:#198       // #4:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  #198 = NameAndType        #151:#199     // makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  #199 = Utf8               (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  #200 = Fieldref           #100.#201     // org/bukkit/Material.CHISELED_QUARTZ_BLOCK:Lorg/bukkit/Material;
+  #201 = NameAndType        #202:#104     // CHISELED_QUARTZ_BLOCK:Lorg/bukkit/Material;
+  #202 = Utf8               CHISELED_QUARTZ_BLOCK
+  #203 = InterfaceMethodref #94.#204      // org/bukkit/block/Block.setType:(Lorg/bukkit/Material;Z)V
+  #204 = NameAndType        #205:#206     // setType:(Lorg/bukkit/Material;Z)V
+  #205 = Utf8               setType
+  #206 = Utf8               (Lorg/bukkit/Material;Z)V
+  #207 = InterfaceMethodref #94.#208      // org/bukkit/block/Block.getWorld:()Lorg/bukkit/World;
+  #208 = NameAndType        #209:#210     // getWorld:()Lorg/bukkit/World;
+  #209 = Utf8               getWorld
+  #210 = Utf8               ()Lorg/bukkit/World;
+  #211 = InterfaceMethodref #212.#213     // org/bukkit/World.getKey:()Lorg/bukkit/NamespacedKey;
+  #212 = Class              #214          // org/bukkit/World
+  #213 = NameAndType        #215:#216     // getKey:()Lorg/bukkit/NamespacedKey;
+  #214 = Utf8               org/bukkit/World
+  #215 = Utf8               getKey
+  #216 = Utf8               ()Lorg/bukkit/NamespacedKey;
+  #217 = Methodref          #218.#219     // org/bukkit/NamespacedKey.toString:()Ljava/lang/String;
+  #218 = Class              #220          // org/bukkit/NamespacedKey
+  #219 = NameAndType        #221:#169     // toString:()Ljava/lang/String;
+  #220 = Utf8               org/bukkit/NamespacedKey
+  #221 = Utf8               toString
+  #222 = InterfaceMethodref #94.#223      // org/bukkit/block/Block.getX:()I
+  #223 = NameAndType        #224:#225     // getX:()I
+  #224 = Utf8               getX
+  #225 = Utf8               ()I
+  #226 = InterfaceMethodref #94.#227      // org/bukkit/block/Block.getY:()I
+  #227 = NameAndType        #228:#225     // getY:()I
+  #228 = Utf8               getY
+  #229 = InterfaceMethodref #94.#230      // org/bukkit/block/Block.getZ:()I
+  #230 = NameAndType        #231:#225     // getZ:()I
+  #231 = Utf8               getZ
+  #232 = InvokeDynamic      #5:#233       // #5:makeConcatWithConstants:(Ljava/lang/String;III)Ljava/lang/String;
+  #233 = NameAndType        #151:#234     // makeConcatWithConstants:(Ljava/lang/String;III)Ljava/lang/String;
+  #234 = Utf8               (Ljava/lang/String;III)Ljava/lang/String;
+  #235 = Methodref          #177.#236     // org/bukkit/Bukkit.getConsoleSender:()Lorg/bukkit/command/ConsoleCommandSender;
+  #236 = NameAndType        #237:#238     // getConsoleSender:()Lorg/bukkit/command/ConsoleCommandSender;
+  #237 = Utf8               getConsoleSender
+  #238 = Utf8               ()Lorg/bukkit/command/ConsoleCommandSender;
+  #239 = Methodref          #177.#240     // org/bukkit/Bukkit.dispatchCommand:(Lorg/bukkit/command/CommandSender;Ljava/lang/String;)Z
+  #240 = NameAndType        #241:#242     // dispatchCommand:(Lorg/bukkit/command/CommandSender;Ljava/lang/String;)Z
+  #241 = Utf8               dispatchCommand
+  #242 = Utf8               (Lorg/bukkit/command/CommandSender;Ljava/lang/String;)Z
+  #243 = InvokeDynamic      #6:#244       // #6:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;
+  #244 = NameAndType        #151:#245     // makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;
+  #245 = Utf8               (Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;
+  #246 = InterfaceMethodref #106.#247     // org/bukkit/entity/Player.getUniqueId:()Ljava/util/UUID;
+  #247 = NameAndType        #248:#249     // getUniqueId:()Ljava/util/UUID;
+  #248 = Utf8               getUniqueId
+  #249 = Utf8               ()Ljava/util/UUID;
+  #250 = Long               1800l
+  #252 = InterfaceMethodref #48.#253      // java/util/Map.remove:(Ljava/lang/Object;)Ljava/lang/Object;
+  #253 = NameAndType        #254:#143     // remove:(Ljava/lang/Object;)Ljava/lang/Object;
+  #254 = Utf8               remove
+  #255 = Methodref          #256.#95      // org/bukkit/inventory/ItemStack.getType:()Lorg/bukkit/Material;
+  #256 = Class              #257          // org/bukkit/inventory/ItemStack
+  #257 = Utf8               org/bukkit/inventory/ItemStack
+  #258 = Methodref          #100.#259     // org/bukkit/Material.isAir:()Z
+  #259 = NameAndType        #260:#261     // isAir:()Z
+  #260 = Utf8               isAir
+  #261 = Utf8               ()Z
+  #262 = Methodref          #256.#263     // org/bukkit/inventory/ItemStack.getItemMeta:()Lorg/bukkit/inventory/meta/ItemMeta;
+  #263 = NameAndType        #264:#265     // getItemMeta:()Lorg/bukkit/inventory/meta/ItemMeta;
+  #264 = Utf8               getItemMeta
+  #265 = Utf8               ()Lorg/bukkit/inventory/meta/ItemMeta;
+  #266 = String             #267          // getItemModel
+  #267 = Utf8               getItemModel
+  #268 = Methodref          #11.#269      // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.invokeNoArgs:(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+  #269 = NameAndType        #270:#271     // invokeNoArgs:(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+  #270 = Utf8               invokeNoArgs
+  #271 = Utf8               (Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+  #272 = Methodref          #11.#273      // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.containsAltarModel:(Ljava/lang/Object;)Z
+  #273 = NameAndType        #274:#275     // containsAltarModel:(Ljava/lang/Object;)Z
+  #274 = Utf8               containsAltarModel
+  #275 = Utf8               (Ljava/lang/Object;)Z
+  #276 = String             #277          // getAsString
+  #277 = Utf8               getAsString
+  #278 = InterfaceMethodref #279.#280     // org/bukkit/inventory/meta/ItemMeta.serialize:()Ljava/util/Map;
+  #279 = Class              #281          // org/bukkit/inventory/meta/ItemMeta
+  #280 = NameAndType        #282:#283     // serialize:()Ljava/util/Map;
+  #281 = Utf8               org/bukkit/inventory/meta/ItemMeta
+  #282 = Utf8               serialize
+  #283 = Utf8               ()Ljava/util/Map;
+  #284 = Class              #285          // java/lang/Throwable
+  #285 = Utf8               java/lang/Throwable
+  #286 = Methodref          #287.#288     // java/lang/Object.getClass:()Ljava/lang/Class;
+  #287 = Class              #289          // java/lang/Object
+  #288 = NameAndType        #290:#291     // getClass:()Ljava/lang/Class;
+  #289 = Utf8               java/lang/Object
+  #290 = Utf8               getClass
+  #291 = Utf8               ()Ljava/lang/Class;
+  #292 = Class              #293          // java/lang/Class
+  #293 = Utf8               java/lang/Class
+  #294 = Methodref          #292.#295     // java/lang/Class.getMethod:(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+  #295 = NameAndType        #296:#297     // getMethod:(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+  #296 = Utf8               getMethod
+  #297 = Utf8               (Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+  #298 = Methodref          #299.#300     // java/lang/reflect/Method.setAccessible:(Z)V
+  #299 = Class              #301          // java/lang/reflect/Method
+  #300 = NameAndType        #302:#303     // setAccessible:(Z)V
+  #301 = Utf8               java/lang/reflect/Method
+  #302 = Utf8               setAccessible
+  #303 = Utf8               (Z)V
+  #304 = Methodref          #299.#305     // java/lang/reflect/Method.invoke:(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+  #305 = NameAndType        #306:#307     // invoke:(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+  #306 = Utf8               invoke
+  #307 = Utf8               (Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+  #308 = Class              #309          // java/lang/ReflectiveOperationException
+  #309 = Utf8               java/lang/ReflectiveOperationException
+  #310 = Class              #311          // java/lang/RuntimeException
+  #311 = Utf8               java/lang/RuntimeException
+  #312 = Fieldref           #313.#314     // java/util/Locale.ROOT:Ljava/util/Locale;
+  #313 = Class              #315          // java/util/Locale
+  #314 = NameAndType        #316:#317     // ROOT:Ljava/util/Locale;
+  #315 = Utf8               java/util/Locale
+  #316 = Utf8               ROOT
+  #317 = Utf8               Ljava/util/Locale;
+  #318 = Methodref          #193.#319     // java/lang/String.toLowerCase:(Ljava/util/Locale;)Ljava/lang/String;
+  #319 = NameAndType        #320:#321     // toLowerCase:(Ljava/util/Locale;)Ljava/lang/String;
+  #320 = Utf8               toLowerCase
+  #321 = Utf8               (Ljava/util/Locale;)Ljava/lang/String;
+  #322 = String             #323          // stellarity:altar_of_the_sacred
+  #323 = Utf8               stellarity:altar_of_the_sacred
+  #324 = Methodref          #193.#325     // java/lang/String.contains:(Ljava/lang/CharSequence;)Z
+  #325 = NameAndType        #326:#327     // contains:(Ljava/lang/CharSequence;)Z
+  #326 = Utf8               contains
+  #327 = Utf8               (Ljava/lang/CharSequence;)Z
+  #328 = InterfaceMethodref #212.#329     // org/bukkit/World.getUID:()Ljava/util/UUID;
+  #329 = NameAndType        #330:#249     // getUID:()Ljava/util/UUID;
+  #330 = Utf8               getUID
+  #331 = InvokeDynamic      #7:#233       // #7:makeConcatWithConstants:(Ljava/lang/String;III)Ljava/lang/String;
+  #332 = InvokeDynamic      #8:#233       // #8:makeConcatWithConstants:(Ljava/lang/String;III)Ljava/lang/String;
+  #333 = Methodref          #11.#334      // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.repairAltarCarrier:(Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)V
+  #334 = NameAndType        #335:#336     // repairAltarCarrier:(Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)V
+  #335 = Utf8               repairAltarCarrier
+  #336 = Utf8               (Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)V
+  #337 = InvokeDynamic      #9:#198       // #9:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  #338 = Class              #339          // org/bukkit/event/Listener
+  #339 = Utf8               org/bukkit/event/Listener
+  #340 = Utf8               ALTAR_MODEL
+  #341 = Utf8               Ljava/lang/String;
+  #342 = Utf8               ConstantValue
+  #343 = Utf8               ALTAR_CACHE_MS
+  #344 = Utf8               J
+  #345 = Utf8               LOCATION_DEDUPE_MS
+  #346 = Utf8               Signature
+  #347 = Utf8               Ljava/util/Map<Ljava/util/UUID;Ljava/lang/Long;>;
+  #348 = Utf8               Ljava/util/Map<Ljava/lang/String;Ljava/lang/Long;>;
+  #349 = Utf8               Code
+  #350 = Utf8               LineNumberTable
+  #351 = Utf8               LocalVariableTable
+  #352 = Utf8               this
+  #353 = Utf8               Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;
+  #354 = Utf8               onEnable
+  #355 = Utf8               onDisable
+  #356 = Utf8               onInteract
+  #357 = Utf8               (Lorg/bukkit/event/player/PlayerInteractEvent;)V
+  #358 = Utf8               event
+  #359 = Utf8               Lorg/bukkit/event/player/PlayerInteractEvent;
+  #360 = Utf8               action
+  #361 = Utf8               StackMapTable
+  #362 = Utf8               MethodParameters
+  #363 = Utf8               RuntimeVisibleAnnotations
+  #364 = Utf8               Lorg/bukkit/event/EventHandler;
+  #365 = Utf8               priority
+  #366 = Utf8               Lorg/bukkit/event/EventPriority;
+  #367 = Utf8               LOWEST
+  #368 = Utf8               ignoreCancelled
+  #369 = Integer            1
+  #370 = Utf8               onPlace
+  #371 = Utf8               (Lorg/bukkit/event/block/BlockPlaceEvent;)V
+  #372 = Utf8               Lorg/bukkit/event/block/BlockPlaceEvent;
+  #373 = Utf8               player
+  #374 = Utf8               Lorg/bukkit/entity/Player;
+  #375 = Utf8               eventItem
+  #376 = Utf8               Lorg/bukkit/inventory/ItemStack;
+  #377 = Utf8               placed
+  #378 = Utf8               Lorg/bukkit/block/Block;
+  #379 = Utf8               direct
+  #380 = Utf8               Z
+  #381 = Utf8               mainHand
+  #382 = Utf8               offHand
+  #383 = Utf8               cached
+  #384 = Utf8               now
+  #385 = Utf8               alreadyUntil
+  #386 = Utf8               Ljava/lang/Long;
+  #387 = Utf8               HIGHEST
+  #388 = Utf8               block
+  #389 = Utf8               dimension
+  #390 = Utf8               command
+  #391 = Utf8               dispatched
+  #392 = Utf8               until
+  #393 = Utf8               item
+  #394 = Utf8               meta
+  #395 = Utf8               Lorg/bukkit/inventory/meta/ItemMeta;
+  #396 = Utf8               reflectedModel
+  #397 = Utf8               Ljava/lang/Object;
+  #398 = Utf8               asString
+  #399 = Utf8               method
+  #400 = Utf8               Ljava/lang/reflect/Method;
+  #401 = Utf8               ignored
+  #402 = Utf8               Ljava/lang/Exception;
+  #403 = Utf8               target
+  #404 = Utf8               methodName
+  #405 = Class              #406          // java/lang/Exception
+  #406 = Utf8               java/lang/Exception
+  #407 = Utf8               value
+  #408 = Utf8               lambda$onPlace$1
+  #409 = Utf8               lambda$onPlace$0
+  #410 = Utf8               (Lorg/bukkit/block/Block;Lorg/bukkit/entity/Player;)Ljava/lang/String;
+  #411 = Utf8               SourceFile
+  #412 = Utf8               LogHorizonStellarityB53AltarCarrierShim.java
+  #413 = Utf8               BootstrapMethods
+  #414 = MethodType         #415          //  ()Ljava/lang/Object;
+  #415 = Utf8               ()Ljava/lang/Object;
+  #416 = MethodHandle       5:#417        // REF_invokeVirtual com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.lambda$onPlace$0:(Lorg/bukkit/block/Block;Lorg/bukkit/entity/Player;)Ljava/lang/String;
+  #417 = Methodref          #11.#418      // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.lambda$onPlace$0:(Lorg/bukkit/block/Block;Lorg/bukkit/entity/Player;)Ljava/lang/String;
+  #418 = NameAndType        #409:#410     // lambda$onPlace$0:(Lorg/bukkit/block/Block;Lorg/bukkit/entity/Player;)Ljava/lang/String;
+  #419 = MethodType         #169          //  ()Ljava/lang/String;
+  #420 = String             #421          // Evento duplicado ignorado no mesmo carrier: \u0001
+  #421 = Utf8               Evento duplicado ignorado no mesmo carrier: \u0001
+  #422 = String             #423          // B5.3 carrier detectado: player=\u0001 block=\u0001 direct=\u0001 main=\u0001 off=\u0001 cached=\u0001
+  #423 = Utf8               B5.3 carrier detectado: player=\u0001 block=\u0001 direct=\u0001 main=\u0001 off=\u0001 cached=\u0001
+  #424 = MethodType         #6            //  ()V
+  #425 = MethodHandle       5:#426        // REF_invokeVirtual com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.lambda$onPlace$1:(Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)V
+  #426 = Methodref          #11.#427      // com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.lambda$onPlace$1:(Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)V
+  #427 = NameAndType        #408:#336     // lambda$onPlace$1:(Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)V
+  #428 = String             #429          // B5.3 skip: carrier mudou antes do tick seguinte: \u0001 atual=\u0001
+  #429 = Utf8               B5.3 skip: carrier mudou antes do tick seguinte: \u0001 atual=\u0001
+  #430 = String             #431          // execute in \u0001 positioned \u0001 \u0001 \u0001 run function loghorizon:stellarity_safe/altar
+  #431 = Utf8               execute in \u0001 positioned \u0001 \u0001 \u0001 run function loghorizon:stellarity_safe/altar
+  #432 = String             #433          // B5.3 altar fallback: player=\u0001 carrier=\u0001 crying_obsidian->chiseled_quartz functionDispatched=\u0001
+  #433 = Utf8               B5.3 altar fallback: player=\u0001 carrier=\u0001 crying_obsidian->chiseled_quartz functionDispatched=\u0001
+  #434 = String             #435          // \u0001:\u0001:\u0001:\u0001
+  #435 = Utf8               \u0001:\u0001:\u0001:\u0001
+  #436 = String             #437          // \u0001 \u0001,\u0001,\u0001
+  #437 = Utf8               \u0001 \u0001,\u0001,\u0001
+  #438 = String             #439          // Ignorando CRYING_OBSIDIAN comum em \u0001 player=\u0001
+  #439 = Utf8               Ignorando CRYING_OBSIDIAN comum em \u0001 player=\u0001
+  #440 = MethodHandle       6:#441        // REF_invokeStatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+  #441 = Methodref          #442.#443     // java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+  #442 = Class              #444          // java/lang/invoke/LambdaMetafactory
+  #443 = NameAndType        #445:#446     // metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+  #444 = Utf8               java/lang/invoke/LambdaMetafactory
+  #445 = Utf8               metafactory
+  #446 = Utf8               (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+  #447 = MethodHandle       6:#448        // REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  #448 = Methodref          #449.#450     // java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  #449 = Class              #451          // java/lang/invoke/StringConcatFactory
+  #450 = NameAndType        #151:#452     // makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  #451 = Utf8               java/lang/invoke/StringConcatFactory
+  #452 = Utf8               (Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+  #453 = Utf8               InnerClasses
+  #454 = Class              #455          // java/lang/invoke/MethodHandles$Lookup
+  #455 = Utf8               java/lang/invoke/MethodHandles$Lookup
+  #456 = Class              #457          // java/lang/invoke/MethodHandles
+  #457 = Utf8               java/lang/invoke/MethodHandles
+  #458 = Utf8               Lookup
+{
+  public com.loghorizon.stellarity.b53altarfallback.LogHorizonStellarityB53AltarCarrierShim();
+    descriptor: ()V
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=3, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #1                  // Method org/bukkit/plugin/java/JavaPlugin."<init>":()V
+         4: aload_0
+         5: new           #7                  // class java/util/HashMap
+         8: dup
+         9: invokespecial #9                  // Method java/util/HashMap."<init>":()V
+        12: putfield      #10                 // Field altarCacheUntil:Ljava/util/Map;
+        15: aload_0
+        16: new           #7                  // class java/util/HashMap
+        19: dup
+        20: invokespecial #9                  // Method java/util/HashMap."<init>":()V
+        23: putfield      #16                 // Field handledLocationsUntil:Ljava/util/Map;
+        26: return
+      LineNumberTable:
+        line 34: 0
+        line 39: 4
+        line 40: 15
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      27     0  this   Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;
+
+  public void onEnable();
+    descriptor: ()V
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=3, locals=1, args_size=1
+         0: aload_0
+         1: invokevirtual #19                 // Method getServer:()Lorg/bukkit/Server;
+         4: invokeinterface #23,  1           // InterfaceMethod org/bukkit/Server.getPluginManager:()Lorg/bukkit/plugin/PluginManager;
+         9: aload_0
+        10: aload_0
+        11: invokeinterface #29,  3           // InterfaceMethod org/bukkit/plugin/PluginManager.registerEvents:(Lorg/bukkit/event/Listener;Lorg/bukkit/plugin/Plugin;)V
+        16: aload_0
+        17: invokevirtual #35                 // Method getLogger:()Ljava/util/logging/Logger;
+        20: ldc           #39                 // String B5.3 TEST shim ativo: CRYING_OBSIDIAN só será tratado como Altar com identidade Stellarity confirmada.
+        22: invokevirtual #41                 // Method java/util/logging/Logger.info:(Ljava/lang/String;)V
+        25: return
+      LineNumberTable:
+        line 44: 0
+        line 45: 16
+        line 46: 25
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      26     0  this   Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;
+
+  public void onDisable();
+    descriptor: ()V
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: getfield      #10                 // Field altarCacheUntil:Ljava/util/Map;
+         4: invokeinterface #47,  1           // InterfaceMethod java/util/Map.clear:()V
+         9: aload_0
+        10: getfield      #16                 // Field handledLocationsUntil:Ljava/util/Map;
+        13: invokeinterface #47,  1           // InterfaceMethod java/util/Map.clear:()V
+        18: return
+      LineNumberTable:
+        line 50: 0
+        line 51: 9
+        line 52: 18
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      19     0  this   Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;
+
+  public void onInteract(org.bukkit.event.player.PlayerInteractEvent);
+    descriptor: (Lorg/bukkit/event/player/PlayerInteractEvent;)V
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=2, locals=3, args_size=2
+         0: aload_1
+         1: invokevirtual #52                 // Method org/bukkit/event/player/PlayerInteractEvent.getAction:()Lorg/bukkit/event/block/Action;
+         4: astore_2
+         5: aload_2
+         6: getstatic     #58                 // Field org/bukkit/event/block/Action.RIGHT_CLICK_BLOCK:Lorg/bukkit/event/block/Action;
+         9: if_acmpeq     20
+        12: aload_2
+        13: getstatic     #64                 // Field org/bukkit/event/block/Action.RIGHT_CLICK_AIR:Lorg/bukkit/event/block/Action;
+        16: if_acmpeq     20
+        19: return
+        20: aload_0
+        21: aload_1
+        22: invokevirtual #67                 // Method org/bukkit/event/player/PlayerInteractEvent.getItem:()Lorg/bukkit/inventory/ItemStack;
+        25: invokevirtual #71                 // Method isAltarItem:(Lorg/bukkit/inventory/ItemStack;)Z
+        28: ifeq          39
+        31: aload_0
+        32: aload_1
+        33: invokevirtual #75                 // Method org/bukkit/event/player/PlayerInteractEvent.getPlayer:()Lorg/bukkit/entity/Player;
+        36: invokevirtual #79                 // Method rememberAltar:(Lorg/bukkit/entity/Player;)V
+        39: return
+      LineNumberTable:
+        line 56: 0
+        line 57: 5
+        line 58: 19
+        line 61: 20
+        line 62: 31
+        line 64: 39
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0      40     0  this   Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;
+            0      40     1 event   Lorg/bukkit/event/player/PlayerInteractEvent;
+            5      35     2 action   Lorg/bukkit/event/block/Action;
+      StackMapTable: number_of_entries = 2
+        frame_type = 252 /* append */
+          offset_delta = 20
+          locals = [ class org/bukkit/event/block/Action ]
+        frame_type = 18 /* same */
+    MethodParameters:
+      Name                           Flags
+      event
+    RuntimeVisibleAnnotations:
+      0: #364(#365=e#366.#367,#368=Z#369)
+        org.bukkit.event.EventHandler(
+          priority=Lorg/bukkit/event/EventPriority;.LOWEST
+          ignoreCancelled=true
+        )
+
+  public void onPlace(org.bukkit.event.block.BlockPlaceEvent);
+    descriptor: (Lorg/bukkit/event/block/BlockPlaceEvent;)V
+    flags: (0x0001) ACC_PUBLIC
+    Code:
+      stack=7, locals=13, args_size=2
+         0: aload_1
+         1: invokevirtual #83                 // Method org/bukkit/event/block/BlockPlaceEvent.getPlayer:()Lorg/bukkit/entity/Player;
+         4: astore_2
+         5: aload_1
+         6: invokevirtual #86                 // Method org/bukkit/event/block/BlockPlaceEvent.getItemInHand:()Lorg/bukkit/inventory/ItemStack;
+         9: astore_3
+        10: aload_0
+        11: aload_3
+        12: invokevirtual #71                 // Method isAltarItem:(Lorg/bukkit/inventory/ItemStack;)Z
+        15: ifeq          23
+        18: aload_0
+        19: aload_2
+        20: invokevirtual #79                 // Method rememberAltar:(Lorg/bukkit/entity/Player;)V
+        23: aload_1
+        24: invokevirtual #89                 // Method org/bukkit/event/block/BlockPlaceEvent.getBlockPlaced:()Lorg/bukkit/block/Block;
+        27: astore        4
+        29: aload         4
+        31: invokeinterface #93,  1           // InterfaceMethod org/bukkit/block/Block.getType:()Lorg/bukkit/Material;
+        36: getstatic     #99                 // Field org/bukkit/Material.CRYING_OBSIDIAN:Lorg/bukkit/Material;
+        39: if_acmpeq     43
+        42: return
+        43: aload_0
+        44: aload_3
+        45: invokevirtual #71                 // Method isAltarItem:(Lorg/bukkit/inventory/ItemStack;)Z
+        48: istore        5
+        50: aload_0
+        51: aload_2
+        52: invokeinterface #105,  1          // InterfaceMethod org/bukkit/entity/Player.getInventory:()Lorg/bukkit/inventory/PlayerInventory;
+        57: invokeinterface #111,  1          // InterfaceMethod org/bukkit/inventory/PlayerInventory.getItemInMainHand:()Lorg/bukkit/inventory/ItemStack;
+        62: invokevirtual #71                 // Method isAltarItem:(Lorg/bukkit/inventory/ItemStack;)Z
+        65: istore        6
+        67: aload_0
+        68: aload_2
+        69: invokeinterface #105,  1          // InterfaceMethod org/bukkit/entity/Player.getInventory:()Lorg/bukkit/inventory/PlayerInventory;
+        74: invokeinterface #116,  1          // InterfaceMethod org/bukkit/inventory/PlayerInventory.getItemInOffHand:()Lorg/bukkit/inventory/ItemStack;
+        79: invokevirtual #71                 // Method isAltarItem:(Lorg/bukkit/inventory/ItemStack;)Z
+        82: istore        7
+        84: aload_0
+        85: aload_2
+        86: invokevirtual #119                // Method hasFreshAltarCache:(Lorg/bukkit/entity/Player;)Z
+        89: istore        8
+        91: iload         5
+        93: ifne          128
+        96: iload         6
+        98: ifne          128
+       101: iload         7
+       103: ifne          128
+       106: iload         8
+       108: ifne          128
+       111: aload_0
+       112: invokevirtual #35                 // Method getLogger:()Ljava/util/logging/Logger;
+       115: aload_0
+       116: aload         4
+       118: aload_2
+       119: invokedynamic #123,  0            // InvokeDynamic #0:get:(Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;Lorg/bukkit/block/Block;Lorg/bukkit/entity/Player;)Ljava/util/function/Supplier;
+       124: invokevirtual #127                // Method java/util/logging/Logger.fine:(Ljava/util/function/Supplier;)V
+       127: return
+       128: aload_0
+       129: aload         4
+       131: invokevirtual #131                // Method locationKey:(Lorg/bukkit/block/Block;)Ljava/lang/String;
+       134: astore        9
+       136: invokestatic  #135                // Method java/lang/System.currentTimeMillis:()J
+       139: lstore        10
+       141: aload_0
+       142: getfield      #16                 // Field handledLocationsUntil:Ljava/util/Map;
+       145: aload         9
+       147: invokeinterface #141,  2          // InterfaceMethod java/util/Map.get:(Ljava/lang/Object;)Ljava/lang/Object;
+       152: checkcast     #144                // class java/lang/Long
+       155: astore        12
+       157: aload         12
+       159: ifnull        188
+       162: aload         12
+       164: invokevirtual #146                // Method java/lang/Long.longValue:()J
+       167: lload         10
+       169: lcmp
+       170: iflt          188
+       173: aload_0
+       174: invokevirtual #35                 // Method getLogger:()Ljava/util/logging/Logger;
+       177: aload         9
+       179: invokedynamic #149,  0            // InvokeDynamic #1:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+       184: invokevirtual #153                // Method java/util/logging/Logger.warning:(Ljava/lang/String;)V
+       187: return
+       188: aload_0
+       189: getfield      #16                 // Field handledLocationsUntil:Ljava/util/Map;
+       192: aload         9
+       194: lload         10
+       196: ldc2_w        #156                // long 1200l
+       199: ladd
+       200: invokestatic  #158                // Method java/lang/Long.valueOf:(J)Ljava/lang/Long;
+       203: invokeinterface #162,  3          // InterfaceMethod java/util/Map.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       208: pop
+       209: aload_0
+       210: invokevirtual #35                 // Method getLogger:()Ljava/util/logging/Logger;
+       213: aload_2
+       214: invokeinterface #166,  1          // InterfaceMethod org/bukkit/entity/Player.getName:()Ljava/lang/String;
+       219: aload_0
+       220: aload         4
+       222: invokevirtual #170                // Method describe:(Lorg/bukkit/block/Block;)Ljava/lang/String;
+       225: iload         5
+       227: iload         6
+       229: iload         7
+       231: iload         8
+       233: invokedynamic #173,  0            // InvokeDynamic #2:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;ZZZZ)Ljava/lang/String;
+       238: invokevirtual #41                 // Method java/util/logging/Logger.info:(Ljava/lang/String;)V
+       241: invokestatic  #176                // Method org/bukkit/Bukkit.getScheduler:()Lorg/bukkit/scheduler/BukkitScheduler;
+       244: aload_0
+       245: aload_0
+       246: aload_2
+       247: aload         4
+       249: aload         9
+       251: invokedynamic #182,  0            // InvokeDynamic #3:run:(Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)Ljava/lang/Runnable;
+       256: invokeinterface #186,  3          // InterfaceMethod org/bukkit/scheduler/BukkitScheduler.runTask:(Lorg/bukkit/plugin/Plugin;Ljava/lang/Runnable;)Lorg/bukkit/scheduler/BukkitTask;
+       261: pop
+       262: return
+      LineNumberTable:
+        line 68: 0
+        line 69: 5
+        line 71: 10
+        line 72: 18
+        line 75: 23
+        line 76: 29
+        line 77: 42
+        line 80: 43
+        line 81: 50
+        line 82: 67
+        line 83: 84
+        line 85: 91
+        line 86: 111
+        line 88: 127
+        line 91: 128
+        line 92: 136
+        line 93: 141
+        line 94: 157
+        line 95: 173
+        line 96: 187
+        line 98: 188
+        line 100: 209
+        line 101: 222
+        line 100: 238
+        line 110: 241
+        line 111: 262
+      LocalVariableTable:
+        Start  Length  Slot  Name   Signature
+            0     263     0  this   Lcom/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim;
+            0     263     1 event   Lorg/bukkit/event/block/BlockPlaceEvent;
+            5     258     2 player   Lorg/bukkit/entity/Player;
+           10     253     3 eventItem   Lorg/bukkit/inventory/ItemStack;
+           29     234     4 placed   Lorg/bukkit/block/Block;
+           50     213     5 direct   Z
+           67     196     6 mainHand   Z
+           84     179     7 offHand   Z
+           91     172     8 cached   Z
+          136     127     9 locationKey   Ljava/lang/String;
+          141     122    10   now   J
+          157     106    12 alreadyUntil   Ljava/lang/Long;
+      StackMapTable: number_of_entries = 4
+        frame_type = 253 /* append */
+          offset_delta = 23
+          locals = [ class org/bukkit/entity/Player, class org/bukkit/inventory/ItemStack ]
+        frame_type = 252 /* append */
+          offset_delta = 19
+          locals = [ class org/bukkit/block/Block ]
+        frame_type = 255 /* full_frame */
+          offset_delta = 84
+          locals = [ class com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim, class org/bukkit/event/block/BlockPlaceEvent, class org/bukkit/entity/Player, class org/bukkit/inventory/ItemStack, class org/bukkit/block/Block, int, int, int, int ]
+          stack = []
+        frame_type = 254 /* append */
+          offset_delta = 59
+          locals = [ class java/lang/String, long, class java/lang/Long ]
+    MethodParameters:
+      Name                           Flags
+      event
+    RuntimeVisibleAnnotations:
+      0: #364(#365=e#366.#387,#368=Z#369)
+        org.bukkit.event.EventHandler(
+          priority=Lorg/bukkit/event/EventPriority;.HIGHEST
+          ignoreCancelled=true
+        )
+}
+SourceFile: "LogHorizonStellarityB53AltarCarrierShim.java"
+BootstrapMethods:
+  0: #440 REF_invokeStatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #414 ()Ljava/lang/Object;
+      #416 REF_invokeVirtual com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.lambda$onPlace$0:(Lorg/bukkit/block/Block;Lorg/bukkit/entity/Player;)Ljava/lang/String;
+      #419 ()Ljava/lang/String;
+  1: #447 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #420 Evento duplicado ignorado no mesmo carrier: \u0001
+  2: #447 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #422 B5.3 carrier detectado: player=\u0001 block=\u0001 direct=\u0001 main=\u0001 off=\u0001 cached=\u0001
+  3: #440 REF_invokeStatic java/lang/invoke/LambdaMetafactory.metafactory:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #424 ()V
+      #425 REF_invokeVirtual com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.lambda$onPlace$1:(Lorg/bukkit/entity/Player;Lorg/bukkit/block/Block;Ljava/lang/String;)V
+      #424 ()V
+  4: #447 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #428 B5.3 skip: carrier mudou antes do tick seguinte: \u0001 atual=\u0001
+  5: #447 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #430 execute in \u0001 positioned \u0001 \u0001 \u0001 run function loghorizon:stellarity_safe/altar
+  6: #447 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #432 B5.3 altar fallback: player=\u0001 carrier=\u0001 crying_obsidian->chiseled_quartz functionDispatched=\u0001
+  7: #447 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #434 \u0001:\u0001:\u0001:\u0001
+  8: #447 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #436 \u0001 \u0001,\u0001,\u0001
+  9: #447 REF_invokeStatic java/lang/invoke/StringConcatFactory.makeConcatWithConstants:(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+    Method arguments:
+      #438 Ignorando CRYING_OBSIDIAN comum em \u0001 player=\u0001
+InnerClasses:
+  public static final #458= #454 of #456; // Lookup=class java/lang/invoke/MethodHandles$Lookup of class java/lang/invoke/MethodHandles
