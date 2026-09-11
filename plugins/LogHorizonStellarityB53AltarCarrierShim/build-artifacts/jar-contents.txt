@@ -1,0 +1,13 @@
+META-INF/
+META-INF/MANIFEST.MF
+com/
+com/loghorizon/
+com/loghorizon/stellarity/
+com/loghorizon/stellarity/b53altarfallback/
+META-INF/maven/
+META-INF/maven/com.loghorizon/
+META-INF/maven/com.loghorizon/loghorizon-stellarity-b53-altar-carrier-shim/
+plugin.yml
+com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.class
+META-INF/maven/com.loghorizon/loghorizon-stellarity-b53-altar-carrier-shim/pom.xml
+META-INF/maven/com.loghorizon/loghorizon-stellarity-b53-altar-carrier-shim/pom.properties

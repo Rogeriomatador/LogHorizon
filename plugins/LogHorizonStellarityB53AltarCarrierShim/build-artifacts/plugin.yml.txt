@@ -1,0 +1,8 @@
+name: LogHorizonStellarityB53AltarCarrierShim
+version: 0.1.0-B5.3-TEST
+main: com.loghorizon.stellarity.b53altarfallback.LogHorizonStellarityB53AltarCarrierShim
+api-version: '26.2'
+author: Log Horizon
+description: Shim de teste para aceitar CRYING_OBSIDIAN como carrier alternativo do Altar apenas quando a identidade do item confirma altar_of_the_sacred.
+softdepend:
+  - LogHorizonStellarityExactTouch
