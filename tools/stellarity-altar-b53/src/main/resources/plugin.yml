@@ -1,0 +1,8 @@
+name: LogHorizonStellarityAltarBridge
+version: 5.3-DIAG1
+main: com.loghorizon.stellarityaltarbridge.LogHorizonStellarityAltarBridge
+api-version: '26.2'
+author: LogHorizon
+description: Diagnostic exact-coordinate bridge for Bedrock Altar placements that arrive as Crying Obsidian.
+softdepend:
+  - LogHorizonStellarityExactTouch
