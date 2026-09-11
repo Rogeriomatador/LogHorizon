@@ -4,18 +4,16 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -23,68 +21,50 @@ import org.bukkit.plugin.java.JavaPlugin;
 /**
  * TEST SHIM B5.3
  *
- * Não substitui a B5.2. Ele só cobre o caminho que o log de 11/09/2026 provou:
- * no Bedrock, algumas colocações laterais do Altar chegam ao Paper como
- * CRYING_OBSIDIAN em vez de CHISELED_QUARTZ_BLOCK.
+ * Não substitui a B5.2. Ele cobre somente o caminho provado pelos logs:
+ * uma colocação Bedrock do Altar pode chegar ao Paper como CRYING_OBSIDIAN,
+ * embora o ItemStack do próprio BlockPlaceEvent continue identificando
+ * stellarity:altar_of_the_sacred.
  *
- * Regra de segurança: Crying Obsidian só é convertido quando a identidade do
- * item confirma stellarity:altar_of_the_sacred de forma direta, na mão atual,
- * ou por um cache curtíssimo criado ao interagir com esse item.
+ * Segurança fail-closed:
+ * - só age em CRYING_OBSIDIAN;
+ * - exige identidade DIRETA no event.getItemInHand();
+ * - usa exatamente event.getBlockPlaced();
+ * - nunca procura carrier por câmera/raycast/proximidade;
+ * - se o Stellarity já criou Marker/ItemDisplay no mesmo X/Z, não chama a
+ *   função novamente, evitando duplicação; apenas corrige o carrier.
  */
 public final class LogHorizonStellarityB53AltarCarrierShim extends JavaPlugin implements Listener {
     private static final String ALTAR_MODEL = "stellarity:altar_of_the_sacred";
-    private static final long ALTAR_CACHE_MS = 1800L;
+    private static final String ALTAR_TAG = "stellarity.altar_of_the_sacred";
+    private static final String ALTAR_DISPLAY_TAG = "stellarity.altar_of_the_sacred_display";
     private static final long LOCATION_DEDUPE_MS = 1200L;
 
-    private final Map<UUID, Long> altarCacheUntil = new HashMap<>();
     private final Map<String, Long> handledLocationsUntil = new HashMap<>();
 
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
-        getLogger().info("B5.3 TEST shim ativo: CRYING_OBSIDIAN só será tratado como Altar com identidade Stellarity confirmada.");
+        getLogger().info("B5.3 TEST shim ativo: fallback fail-closed para CRYING_OBSIDIAN do Altar.");
     }
 
     @Override
     public void onDisable() {
-        altarCacheUntil.clear();
         handledLocationsUntil.clear();
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onInteract(PlayerInteractEvent event) {
-        Action action = event.getAction();
-        if (action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) {
-            return;
-        }
-
-        if (isAltarItem(event.getItem())) {
-            rememberAltar(event.getPlayer());
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
-        Player player = event.getPlayer();
-        ItemStack eventItem = event.getItemInHand();
-
-        if (isAltarItem(eventItem)) {
-            rememberAltar(player);
-        }
-
         Block placed = event.getBlockPlaced();
         if (placed.getType() != Material.CRYING_OBSIDIAN) {
             return;
         }
 
-        boolean direct = isAltarItem(eventItem);
-        boolean mainHand = isAltarItem(player.getInventory().getItemInMainHand());
-        boolean offHand = isAltarItem(player.getInventory().getItemInOffHand());
-        boolean cached = hasFreshAltarCache(player);
-
-        if (!direct && !mainHand && !offHand && !cached) {
-            getLogger().fine(() -> "Ignorando CRYING_OBSIDIAN comum em " + describe(placed)
-                    + " player=" + player.getName());
+        ItemStack eventItem = event.getItemInHand();
+        if (!isAltarItem(eventItem)) {
+            // Crying Obsidian normal nunca é tocada pelo shim.
+            getLogger().fine(() -> "Ignorando CRYING_OBSIDIAN sem identidade direta de Altar em "
+                    + describe(placed) + " player=" + event.getPlayer().getName());
             return;
         }
 
@@ -97,61 +77,74 @@ public final class LogHorizonStellarityB53AltarCarrierShim extends JavaPlugin im
         }
         handledLocationsUntil.put(locationKey, now + LOCATION_DEDUPE_MS);
 
-        getLogger().info("B5.3 carrier detectado: player=" + player.getName()
+        Player player = event.getPlayer();
+        getLogger().info("B5.3 carrier confirmado: player=" + player.getName()
                 + " block=" + describe(placed)
-                + " direct=" + direct
-                + " main=" + mainHand
-                + " off=" + offHand
-                + " cached=" + cached);
+                + " eventItem=" + eventItem.getType()
+                + " itemModel=" + ALTAR_MODEL);
 
-        // Executa no tick seguinte para não disputar a mutação do bloco dentro do
-        // BlockPlaceEvent com o Geyser/Stellarity. Só age se o carrier ainda for
-        // exatamente CRYING_OBSIDIAN naquele X/Y/Z.
+        // Aguarda um tick para deixar o Stellarity concluir qualquer criação de
+        // Marker/ItemDisplay da colocação original. Depois corrige SOMENTE o
+        // carrier exato recebido pelo BlockPlaceEvent.
         Bukkit.getScheduler().runTask(this, () -> repairAltarCarrier(player, placed, locationKey));
     }
 
     private void repairAltarCarrier(Player player, Block block, String locationKey) {
         if (block.getType() != Material.CRYING_OBSIDIAN) {
-            getLogger().info("B5.3 skip: carrier mudou antes do tick seguinte: " + describe(block)
+            getLogger().info("B5.3 skip: carrier já mudou antes da correção: " + describe(block)
                     + " atual=" + block.getType());
             return;
         }
 
+        boolean existingAltarEntity = hasAltarEntityInExactColumn(block);
+
+        // Corrige apenas o carrier. O log histórico provou que, no caminho que
+        // falha, Marker/ItemDisplay podem já existir mesmo enquanto o bloco-base
+        // permanece CRYING_OBSIDIAN.
         block.setType(Material.CHISELED_QUARTZ_BLOCK, false);
 
-        String dimension = block.getWorld().getKey().toString();
-        String command = "execute in " + dimension
-                + " positioned " + block.getX() + " " + block.getY() + " " + block.getZ()
-                + " run function loghorizon:stellarity_safe/altar";
-
-        boolean dispatched = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        boolean dispatched = false;
+        if (!existingAltarEntity) {
+            String dimension = block.getWorld().getKey().toString();
+            String command = "execute in " + dimension
+                    + " positioned " + block.getX() + " " + block.getY() + " " + block.getZ()
+                    + " run function loghorizon:stellarity_safe/altar";
+            dispatched = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        }
 
         getLogger().info("B5.3 altar fallback: player=" + player.getName()
                 + " carrier=" + locationKey
                 + " crying_obsidian->chiseled_quartz"
+                + " existingAltarEntity=" + existingAltarEntity
                 + " functionDispatched=" + dispatched);
     }
 
-    private void rememberAltar(Player player) {
-        altarCacheUntil.put(player.getUniqueId(), System.currentTimeMillis() + ALTAR_CACHE_MS);
-    }
+    private boolean hasAltarEntityInExactColumn(Block block) {
+        double cx = block.getX() + 0.5D;
+        double cy = block.getY() + 1.0D;
+        double cz = block.getZ() + 0.5D;
 
-    private boolean hasFreshAltarCache(Player player) {
-        Long until = altarCacheUntil.get(player.getUniqueId());
-        if (until == null) {
-            return false;
+        for (Entity entity : block.getWorld().getNearbyEntities(
+                new org.bukkit.Location(block.getWorld(), cx, cy, cz), 0.9D, 1.6D, 0.9D)) {
+            int ex = entity.getLocation().getBlockX();
+            int ez = entity.getLocation().getBlockZ();
+            if (ex != block.getX() || ez != block.getZ()) {
+                continue;
+            }
+
+            if (entity.getScoreboardTags().contains(ALTAR_TAG)
+                    || entity.getScoreboardTags().contains(ALTAR_DISPLAY_TAG)) {
+                return true;
+            }
         }
-        if (until < System.currentTimeMillis()) {
-            altarCacheUntil.remove(player.getUniqueId());
-            return false;
-        }
-        return true;
+        return false;
     }
 
     /**
-     * Usa várias formas de leitura sem depender de uma única API específica de
-     * item_model. O Paper 26.2 expõe item_model, mas reflexão + serialize/toString
-     * deixa o shim mais tolerante entre builds 65 e 84.
+     * O Bug Reporter já registrou eventos CRYING_OBSIDIAN cujo eventItem era
+     * CHISELED_QUARTZ_BLOCK com item_model=stellarity:altar_of_the_sacred.
+     * Lemos a identidade por múltiplas representações para tolerar diferenças
+     * entre builds Paper 26.2 sem aceitar um bloco comum por material apenas.
      */
     private boolean isAltarItem(ItemStack item) {
         if (item == null || item.getType().isAir()) {
