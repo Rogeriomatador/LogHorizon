@@ -1,0 +1,59 @@
+name: Build Stellarity Altar B5.3
+
+on:
+  push:
+    branches:
+      - fix/stellarity-altar-b53
+    paths:
+      - 'tools/stellarity-altar-b53/**'
+      - '.github/workflows/build-stellarity-altar-b53.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Build
+        run: mvn -B -f tools/stellarity-altar-b53/pom.xml clean package
+
+      - name: Verify JAR and checksum
+        shell: bash
+        run: |
+          JAR='tools/stellarity-altar-b53/target/LogHorizonStellarityAltarBridge-B5.3-DIAG1.jar'
+          test -s "$JAR"
+          jar tf "$JAR" | grep -F 'com/loghorizon/stellarityaltarbridge/LogHorizonStellarityAltarBridge.class'
+          jar tf "$JAR" | grep -F 'plugin.yml'
+          mkdir -p artifacts/stellarity
+          cp "$JAR" artifacts/stellarity/LogHorizonStellarityAltarBridge-B5.3-DIAG1.jar
+          sha256sum "$JAR" | tee artifacts/stellarity/LogHorizonStellarityAltarBridge-B5.3-DIAG1.jar.sha256
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizonStellarityAltarBridge-B5.3-DIAG1
+          path: |
+            artifacts/stellarity/LogHorizonStellarityAltarBridge-B5.3-DIAG1.jar
+            artifacts/stellarity/LogHorizonStellarityAltarBridge-B5.3-DIAG1.jar.sha256
+
+      - name: Commit built artifact to test branch
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add artifacts/stellarity/LogHorizonStellarityAltarBridge-B5.3-DIAG1.jar artifacts/stellarity/LogHorizonStellarityAltarBridge-B5.3-DIAG1.jar.sha256
+          if ! git diff --cached --quiet; then
+            git commit -m 'Build Stellarity Altar B5.3 DIAG1 [skip ci]'
+            git push
+          fi
