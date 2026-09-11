@@ -1,23 +1,21 @@
 Compiled from "LogHorizonStellarityB53AltarCarrierShim.java"
 public final class com.loghorizon.stellarity.b53altarfallback.LogHorizonStellarityB53AltarCarrierShim extends org.bukkit.plugin.java.JavaPlugin implements org.bukkit.event.Listener {
   private static final java.lang.String ALTAR_MODEL;
-  private static final long ALTAR_CACHE_MS;
+  private static final java.lang.String ALTAR_TAG;
+  private static final java.lang.String ALTAR_DISPLAY_TAG;
   private static final long LOCATION_DEDUPE_MS;
-  private final java.util.Map<java.util.UUID, java.lang.Long> altarCacheUntil;
   private final java.util.Map<java.lang.String, java.lang.Long> handledLocationsUntil;
   public com.loghorizon.stellarity.b53altarfallback.LogHorizonStellarityB53AltarCarrierShim();
   public void onEnable();
   public void onDisable();
-  public void onInteract(org.bukkit.event.player.PlayerInteractEvent);
   public void onPlace(org.bukkit.event.block.BlockPlaceEvent);
   private void repairAltarCarrier(org.bukkit.entity.Player, org.bukkit.block.Block, java.lang.String);
-  private void rememberAltar(org.bukkit.entity.Player);
-  private boolean hasFreshAltarCache(org.bukkit.entity.Player);
+  private boolean hasAltarEntityInExactColumn(org.bukkit.block.Block);
   private boolean isAltarItem(org.bukkit.inventory.ItemStack);
   private java.lang.Object invokeNoArgs(java.lang.Object, java.lang.String);
   private boolean containsAltarModel(java.lang.Object);
   private java.lang.String locationKey(org.bukkit.block.Block);
   private java.lang.String describe(org.bukkit.block.Block);
   private void lambda$onPlace$1(org.bukkit.entity.Player, org.bukkit.block.Block, java.lang.String);
-  private java.lang.String lambda$onPlace$0(org.bukkit.block.Block, org.bukkit.entity.Player);
+  private java.lang.String lambda$onPlace$0(org.bukkit.block.Block, org.bukkit.event.block.BlockPlaceEvent);
 }
