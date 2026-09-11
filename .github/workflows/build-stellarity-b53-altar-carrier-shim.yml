@@ -1,0 +1,86 @@
+name: Build Stellarity B5.3 Altar Carrier Shim
+
+on:
+  push:
+    branches:
+      - fix/stellarity-b53-altar-carrier-shim
+    paths:
+      - plugins/LogHorizonStellarityB53AltarCarrierShim/**
+      - .github/workflows/build-stellarity-b53-altar-carrier-shim.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Build and statically validate
+        working-directory: plugins/LogHorizonStellarityB53AltarCarrierShim
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build-artifacts
+          mvn -B clean package 2>&1 | tee build-artifacts/maven-build.log
+
+          JAR="target/LogHorizonStellarityB53AltarCarrierShim-0.1.0-B5.3-TEST.jar"
+          OUT="build-artifacts/LogHorizonStellarityB53AltarCarrierShim-0.1.0-B5.3-TEST.jar"
+
+          test -f "$JAR"
+          cp "$JAR" "$OUT"
+          sha256sum "$OUT" > build-artifacts/LogHorizonStellarityB53AltarCarrierShim-0.1.0-B5.3-TEST.sha256
+
+          jar tf "$OUT" | tee build-artifacts/jar-contents.txt
+          jar tf "$OUT" | grep -q 'com/loghorizon/stellarity/b53altarfallback/LogHorizonStellarityB53AltarCarrierShim.class'
+          jar tf "$OUT" | grep -q '^plugin.yml$'
+
+          unzip -p "$OUT" plugin.yml | tee build-artifacts/plugin.yml.txt
+          unzip -p "$OUT" plugin.yml | grep -q "name: LogHorizonStellarityB53AltarCarrierShim"
+          unzip -p "$OUT" plugin.yml | grep -q "version: 0.1.0-B5.3-TEST"
+          unzip -p "$OUT" plugin.yml | grep -q "api-version: '26.2'"
+
+          javap -classpath "$OUT" -p com.loghorizon.stellarity.b53altarfallback.LogHorizonStellarityB53AltarCarrierShim \
+            | tee build-artifacts/javap.txt
+          grep -q 'onPlace' build-artifacts/javap.txt
+          grep -q 'isAltarItem' build-artifacts/javap.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LogHorizonStellarityB53AltarCarrierShim-0.1.0-B5.3-TEST
+          path: |
+            plugins/LogHorizonStellarityB53AltarCarrierShim/build-artifacts/LogHorizonStellarityB53AltarCarrierShim-0.1.0-B5.3-TEST.jar
+            plugins/LogHorizonStellarityB53AltarCarrierShim/build-artifacts/LogHorizonStellarityB53AltarCarrierShim-0.1.0-B5.3-TEST.sha256
+            plugins/LogHorizonStellarityB53AltarCarrierShim/build-artifacts/maven-build.log
+            plugins/LogHorizonStellarityB53AltarCarrierShim/build-artifacts/jar-contents.txt
+            plugins/LogHorizonStellarityB53AltarCarrierShim/build-artifacts/plugin.yml.txt
+            plugins/LogHorizonStellarityB53AltarCarrierShim/build-artifacts/javap.txt
+          if-no-files-found: error
+
+      - name: Publish validated build back to isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f plugins/LogHorizonStellarityB53AltarCarrierShim/build-artifacts
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Compilar shim Stellarity B5.3 Altar Carrier [skip ci]'
+          git push origin HEAD:fix/stellarity-b53-altar-carrier-shim
