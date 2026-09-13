@@ -27,8 +27,8 @@ jobs:
           mkdir -p downloads
           rm -f downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip
           cd artifact-src/LogHorizon-Stellarity-B4-DragonBootstrapFix
-          zip -q -r ../../../downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip pack.mcmeta data README.txt
-          cd ../../..
+          zip -q -r ../../downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip pack.mcmeta data README.txt
+          cd ../..
           unzip -t downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip
           sha256sum downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip > downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip.sha256
 
