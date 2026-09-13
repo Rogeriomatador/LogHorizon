@@ -1,0 +1,47 @@
+name: Build B4 Dragon Bootstrap Datapack
+
+on:
+  push:
+    branches:
+      - artifact/b4-dragon-bootstrap
+    paths:
+      - 'artifact-src/LogHorizon-Stellarity-B4-DragonBootstrapFix/**'
+      - '.github/workflows/build-b4-dragon-bootstrap.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: artifact/b4-dragon-bootstrap
+
+      - name: Build datapack ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p downloads
+          rm -f downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip
+          cd artifact-src/LogHorizon-Stellarity-B4-DragonBootstrapFix
+          zip -q -r ../../../downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip pack.mcmeta data README.txt
+          cd ../../..
+          unzip -t downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip
+          sha256sum downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip > downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip.sha256
+
+      - name: Commit built artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip downloads/ZZZZZZZZ-LogHorizon-Stellarity-B4-DragonBootstrapFix.zip.sha256
+          if git diff --cached --quiet; then
+            echo 'Artifact unchanged.'
+            exit 0
+          fi
+          git commit -m 'Build B4 Dragon Bootstrap datapack artifact'
+          git push origin HEAD:artifact/b4-dragon-bootstrap
